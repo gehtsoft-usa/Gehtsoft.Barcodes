@@ -27,7 +27,7 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines. Can be 0.</param>
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <returns>Byte array</returns>
-        internal static byte[] GetBarcodeImageEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 4, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
+        internal static byte[] GetBarcodeImageEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
         {
             // Draw barcode on bitmap:
             Bitmap bitmap = DrawBitmapEAN_UPC(encodedData, textDataString, barcodeType, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones);
@@ -52,7 +52,7 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="strokeColor">The color of barcode lines.</param>
         /// <returns></returns>
         internal static byte[] GetBarcodeImageGS1_128(byte[] encodedData, string textDataString,
-            MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 4,
+            MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 2,
             Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
         {
             // Draw barcode on bitmap:
@@ -78,7 +78,7 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
         /// <returns>Bitmap</returns>
-        internal static Bitmap DrawBitmapEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, MeasureBarcodeUnit heightToCut, bool showDataLabel, int scaleMultiplier = 4, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
+        internal static Bitmap DrawBitmapEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, MeasureBarcodeUnit heightToCut, bool showDataLabel, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
         {
             // Bitmap accepts only integer values:
             int barcodeWidth;
@@ -87,12 +87,13 @@ namespace Gehtsoft.Barcodes.Rendering
             int separatorHeight;
             int leftQuiteZoneCount;
             int leftCodePartCount;
-            int shiftFromTop = 1 * scaleMultiplier;
+            int shiftFromTop = EANData.shift_from_top * scaleMultiplier;
             Font labelFont = new Font(EANData.font_family_name, EANData.default_font_size * scaleMultiplier);
             Font labelFontSmall = new Font(EANData.font_family_name, EANData.default_font_small_size * scaleMultiplier);
             string textDataLeft;
             string textDataRight;
             int dotsPerInch = EANData.dots_per_inch;
+            int halfBarItemWidth = scaleMultiplier / 2;
 
             switch (barcodeType)
             {
@@ -137,8 +138,6 @@ namespace Gehtsoft.Barcodes.Rendering
                 rightQuiteZoneCount = 0;
             }
 
-            int penWidth = 1 * scaleMultiplier;
-
             // Calculate the percent the user wants to cut from the top depending on height:
             float percentToCut = BarcodesUtils.GetPercentToCut(barcodeHeight, heightToCut, scaleMultiplier);
 
@@ -157,17 +156,17 @@ namespace Gehtsoft.Barcodes.Rendering
             using (var graphics = Graphics.FromImage(bitmap))
             {
                 void DrawStrokeLine(int pos, bool isSeparator = false)
-                {
-                    graphics.DrawLine(new Pen(strokeColor ?? Color.Black, penWidth),
-                        new PointF(pos * penWidth, shiftFromTop),
-                        new PointF(pos * penWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight)));
+                { 
+                    graphics.DrawLine(new Pen(strokeColor ?? Color.Black, scaleMultiplier),
+                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop),
+                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight)));
                 }
 
                 void DrawSpaceLine(int pos, bool isSeparator = false)
                 {
-                    graphics.DrawLine(new Pen(backColor ?? Color.White, penWidth),
-                        new PointF(pos * penWidth, shiftFromTop),
-                        new PointF(pos * penWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight)));
+                    graphics.DrawLine(new Pen(backColor ?? Color.White, scaleMultiplier),
+                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop),
+                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight)));
                 }
 
                 // Paint the background:
@@ -175,7 +174,7 @@ namespace Gehtsoft.Barcodes.Rendering
 
                 int x = 0;
 
-                // Leave a quite zone:
+                // Left quite zone:
                 while (x < leftQuiteZoneCount)
                 {
                     DrawSpaceLine(x++);
@@ -315,7 +314,7 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="strokeColor">The color of barcode lines.</param>
         /// <returns>Bitmap</returns>
         internal static Bitmap DrawBitmapGS1_128(byte[] encodedData, string textDataString,
-            MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 4,
+            MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 2,
             Color? strokeColor = null, Color ? backColor = null, bool hasQuietZones = true)
         {            
             int halfBarItemWidth = scaleMultiplier / 2;

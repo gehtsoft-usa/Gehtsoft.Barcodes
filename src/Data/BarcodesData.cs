@@ -26,6 +26,7 @@ namespace Gehtsoft.Barcodes.Data
         internal const float default_font_size = 10f;
         internal const float default_font_small_size = 8f;
         internal const int dots_per_inch = 600;
+        internal const int shift_from_top = 0;
         internal const string font_family_name = "Microsoft Sans Serif";
         internal const int left_quite_zone_count_EAN_13 = 11;
         internal const int left_quite_zone_count_EAN_8 = 7;
