@@ -67,7 +67,7 @@ partial class Build : NukeBuild
             EnsureCleanDirectory(TestResultDirectory);
             DotNetTest(_ => _
                     .SetConfiguration(Configuration)
-                    .SetVerbosity(DotNetVerbosity.Minimal)
+                    .SetVerbosity(DotNetVerbosity.Normal)
                     .SetNoBuild(InvokedTargets.Contains(Compile))
                     .SetResultsDirectory(TestResultDirectory)
                     .CombineWith(TestProjects, (_, v) => _
