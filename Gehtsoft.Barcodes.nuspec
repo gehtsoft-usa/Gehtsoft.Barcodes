@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+    <metadata>
+        <id>Gehtsoft.Barcodes</id>
+        <version>$version$</version>
+        <authors>GehtsoftUSA</authors>
+        <owners>GehtsoftUSA</owners>
+        <projectUrl>https://www.pdfflow.io/</projectUrl>
+        <license type="file">LICENSE.txt</license>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        
+        <description>
+		Gehtsoft.Barcodes is a cross-platform C# library for generation of different types of barcodes and QR codes. 
+		The goal of the Gehtsoft.Barcodes library is to provide .NET application developers with a solution that allows 
+		them to create creates barcodes (including QR codes) quickly.
+
+		You can easily add barcodes to your application using the convenient API methods.
+
+		The following platforms are supported:
+
+			- .NET Framework 4.5.1 and later
+			- .NET Standard 2.0
+	
+		MAIN FEATURES
+		
+		Currently the library supports generation of the following types of barcodes and QR codes: 
+
+			- EAN8;
+			- EAN13;
+			- GS1-128A;
+			- GS1-128B;
+			- GS1-128C;
+			- UPC_A;
+			- QR code.
+			
+		For more information about the Gehtsoft.Barcodes library, including on how to get started, please visit https://github.com/gehtsoft-usa/Gehtsoft.Barcodes
+
+		Additionally,  you can get our other proprietary library for generating PDF documents with convenient integration. 
+		Using the GS PDFFlow library (https://www.nuget.org/packages/Gehtsoft.PDFFlowlib), you can easily add barcodes to simple and complex documents that you 
+		generate in C#.		
+		
+		CONTACTS
+		To report issues with the library or request changes or features, please open an issue at https://github.com/gehtsoft-usa/Gehtsoft.Barcodes/issues.
+		We welcome contributions to the project. Please contact us at contact@gehtsoftusa.com if you would like to include your work in the library.
+		
+		LICENSE
+		The library is shared under GNU LGPL license and is free to use. Please consult the GNU LGPL license for details on proper usage of the library.
+
+		THE CODE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+		FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR 
+		OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE MATERIALS OR THE USE OR 
+		OTHER DEALINGS IN THE MATERIALS.
+        </description>
+        <releaseNotes>
+            Release 1.0.1
+			
+			Currently the library supports generation of the following types of barcodes and QR codes: 
+				- EAN8;
+				- EAN13;
+				- GS1-128A;
+				- GS1-128B;
+				- GS1-128C;
+				- UPC_A;
+				- QR code.
+        </releaseNotes>
+        
+        <copyright>Gehtsoft USA LLC 2016-2021</copyright>
+        <dependencies>
+            <group targetFramework="netstandard2.0">
+                <dependency id="System.Drawing.Common" version="5.0.1" />
+            </group>
+            <group targetFramework="net451">
+            </group>
+        </dependencies>
+    </metadata>
+    <files>
+        <file src="src\bin\Release\net451\Gehtsoft.Barcodes.dll" target="lib\net451" />
+        <file src="src\bin\Release\netstandard2.0\Gehtsoft.Barcodes.dll" target="lib\netstandard2.0" />
+        <file src="LICENSE.txt" target="" />
+    </files>
+</package>
