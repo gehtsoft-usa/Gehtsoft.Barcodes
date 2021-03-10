@@ -5,33 +5,27 @@
         <version>$version$</version>
         <authors>GehtsoftUSA</authors>
         <owners>GehtsoftUSA</owners>
-        <projectUrl>https://www.pdfflow.io/</projectUrl>
+        <projectUrl>https://github.com/gehtsoft-usa/Gehtsoft.Barcodes/</projectUrl>
         <license type="file">LICENSE.txt</license>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         
         <description>
-		Gehtsoft.Barcodes is a cross-platform C# library for generation of different types of barcodes and QR codes. 
-		The goal of the Gehtsoft.Barcodes library is to provide .NET application developers with a solution that allows 
-		them to create creates barcodes (including QR codes) quickly.
-
+		Gehtsoft.Barcodes is a cross-platform C# library for generation of different types of barcodes and QR codes. The goal of the Gehtsoft.Barcodes library is to provide .NET application developers with a solution that allows them to create barcodes (including QR codes) quickly. 
 		You can easily add barcodes to your application using the convenient API methods.
 
 		The following platforms are supported:
-
-			- .NET Framework 4.5.1 and later
-			- .NET Standard 2.0
+		- .NET Framework 4.5.1 and later
+	 	- .NET Standard 2.0
 	
 		MAIN FEATURES
-		
 		Currently the library supports generation of the following types of barcodes and QR codes: 
-
 			- EAN8;
 			- EAN13;
 			- GS1-128A;
 			- GS1-128B;
 			- GS1-128C;
 			- UPC_A;
-			- QR code.
+			- QR codes
 			
 		For more information about the Gehtsoft.Barcodes library, including on how to get started, please visit https://github.com/gehtsoft-usa/Gehtsoft.Barcodes
 
@@ -53,15 +47,14 @@
         </description>
         <releaseNotes>
             Release 1.0.1
-			
-			Currently the library supports generation of the following types of barcodes and QR codes: 
-				- EAN8;
-				- EAN13;
-				- GS1-128A;
-				- GS1-128B;
-				- GS1-128C;
-				- UPC_A;
-				- QR code.
+		Currently the library supports generation of the following types of barcodes and QR codes: 
+		- EAN8;
+		- EAN13;
+		- GS1-128A;
+		- GS1-128B;
+		- GS1-128C;
+		- UPC_A;
+		- QR codes.
         </releaseNotes>
         
         <copyright>Gehtsoft USA LLC 2016-2021</copyright>
