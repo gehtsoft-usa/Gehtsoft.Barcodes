@@ -1,17 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gehtsoft.Barcodes", "src\Gehtsoft.Barcodes.csproj", "{05599090-093E-4632-A9C1-0E78DEE9945F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gehtsoft.Barcodes", "src\Gehtsoft.Barcodes.csproj", "{05599090-093E-4632-A9C1-0E78DEE9945F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{2DEF015A-0731-40EE-BAA8-F78CC5AA96F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gehtsoft.Barcodes.UnitTests", "tests\Gehtsoft.Barcodes.UnitTests\Gehtsoft.Barcodes.UnitTests.csproj", "{F0F220CD-9690-4196-8E9F-B160C6842826}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gehtsoft.Barcodes.UnitTests", "tests\Gehtsoft.Barcodes.UnitTests\Gehtsoft.Barcodes.UnitTests.csproj", "{F0F220CD-9690-4196-8E9F-B160C6842826}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.csproj", "{30D381A5-44B2-4B08-B26C-D284A6A60A00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gehtsoft.Barcodes.Examples", "tests\Gehtsoft.Barcodes.Examples\Gehtsoft.Barcodes.Examples.csproj", "{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gehtsoft.Barcodes.Examples", "tests\Gehtsoft.Barcodes.Examples\Gehtsoft.Barcodes.Examples.csproj", "{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,12 +22,7 @@ Global
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05599090-093E-4632-A9C1-0E78DEE9945F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{05599090-093E-4632-A9C1-0E78DEE9945F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05599090-093E-4632-A9C1-0E78DEE9945F}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -52,6 +47,16 @@ Global
 		{F0F220CD-9690-4196-8E9F-B160C6842826}.Release|x64.Build.0 = Release|Any CPU
 		{F0F220CD-9690-4196-8E9F-B160C6842826}.Release|x86.ActiveCfg = Release|Any CPU
 		{F0F220CD-9690-4196-8E9F-B160C6842826}.Release|x86.Build.0 = Release|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Debug|x64.Build.0 = Debug|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Debug|x86.Build.0 = Debug|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Release|x64.ActiveCfg = Release|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Release|x64.Build.0 = Release|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Release|x86.ActiveCfg = Release|Any CPU
+		{30D381A5-44B2-4B08-B26C-D284A6A60A00}.Release|x86.Build.0 = Release|Any CPU
 		{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -65,8 +70,14 @@ Global
 		{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1}.Release|x86.ActiveCfg = Release|Any CPU
 		{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F0F220CD-9690-4196-8E9F-B160C6842826} = {2DEF015A-0731-40EE-BAA8-F78CC5AA96F4}
 		{2DA32C47-345F-4B16-987C-FE7EAAEA1CC1} = {2DEF015A-0731-40EE-BAA8-F78CC5AA96F4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B255222B-DD63-407C-B870-4D7DA56C4203}
 	EndGlobalSection
 EndGlobal

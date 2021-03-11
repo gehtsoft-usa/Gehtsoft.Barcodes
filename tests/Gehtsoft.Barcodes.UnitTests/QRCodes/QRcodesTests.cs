@@ -10,33 +10,33 @@ using Gehtsoft.Barcodes.UserAPI;
 using Gehtsoft.Barcodes.Utils;
 using Xunit;
 // ReSharper disable InconsistentNaming
+using System.Drawing;
 
 namespace Gehtsoft.Barcodes.UnitTests
 {
     public sealed class QRCodesTests
     {
         [Theory]
-        [InlineData(QRCodeErrorCorrection.L, "ACC40A7C27368A024EFE8747EF491B6D094C4EE1E1C7798FD6A857C977D9E073", "Low level")]
-        [InlineData(QRCodeErrorCorrection.M, "AB15C5C89550D796361B85587120CDC0712AF6A9BEF3E77AEC2E9D1634DC0903", "Medium level")]
-        [InlineData(QRCodeErrorCorrection.Q, "DAD52BD28B4475D8FCFFEE347242B75197056C2F00DFE3F08EA9A4151375EFFF", "High level")]
-        [InlineData(QRCodeErrorCorrection.H, "1E239808ABED8BEBFD745C5849E1C3DE88798150FBEB3DD9236F35F6E6DE4CBB", "Max level")]
+        [InlineData(QRCodeErrorCorrection.L, "7DE8EB5F591400527B7302502D10BAB829E6A5AA8A742E5553CF8A08A541881F", "Low level")]
+        [InlineData(QRCodeErrorCorrection.M, "A2D9FCAA7833732ED2C4ABD472F0724683FA5561AFFAC94DA6890E2E691A73ED", "Medium level")]
+        [InlineData(QRCodeErrorCorrection.Q, "C10D158F700054569E02F6FA1DFDE27181351D3E9051BFA50078F820905C7D6D", "High level")]
+        [InlineData(QRCodeErrorCorrection.H, "55797CA63FC4B3A0B6BD6D0DD4ACFC6CC18CC8D9D2DE885FEC091083D334207E", "Max level")]
         public void TestErrorCorrectionOfQRCode(QRCodeErrorCorrection correctionLevel, string expectedHash,
             string caseName)
         {
             // Method 1
             byte[] data = BarcodesMaker.GetQRCode("test", QRCodeEncodingMethod.Binary, correctionLevel, 1);
-            string hash = CalculateSHA2(data);
+            string hash = CalculateImageCanvasHash(data);
             hash.Should().Be(expectedHash);
             
             // Method 2
             data = BarcodesMaker.GetQRCode("test", QRCodeEncodingMethod.Binary, correctionLevel, QRCodeVersion.Version1, 1, 
                 Color.Black, Color.White);
-            hash = CalculateSHA2(data);
+            hash = CalculateImageCanvasHash(data);
             hash.Should().Be(expectedHash);
             
             Assert.True(true, caseName);
         }
-
 
         [Fact]
         public void TestVersionsOfQRCode()
@@ -46,13 +46,13 @@ namespace Gehtsoft.Barcodes.UnitTests
                 // Method 1
                 byte[] data = BarcodesMaker.GetQRCode("test", QRCodeEncodingMethod.Binary,
                     QRCodeErrorCorrection.M, (QRCodeVersion) version);
-                string hash = CalculateSHA2(data);
+                string hash = CalculateImageCanvasHash(data);
                 hash.Should().Be(QRCodesTestData.HashSHA2[version]);
-                
+
                 // Method 2
                 data = BarcodesMaker.GetQRCode("test", QRCodeEncodingMethod.Binary, QRCodeErrorCorrection.M,
                     (QRCodeVersion) version, 1, Color.Black, Color.White);
-                hash = CalculateSHA2(data);
+                hash = CalculateImageCanvasHash(data);
                 hash.Should().Be(QRCodesTestData.HashSHA2[version]);
             }
         }
@@ -74,21 +74,21 @@ namespace Gehtsoft.Barcodes.UnitTests
         }
 
         [Theory]
-        [InlineData("test", "AB15C5C89550D796361B85587120CDC0712AF6A9BEF3E77AEC2E9D1634DC0903", 
+        [InlineData("test", "A2D9FCAA7833732ED2C4ABD472F0724683FA5561AFFAC94DA6890E2E691A73ED", 
                     false, "Minimal QR-code")]
-        [InlineData("test 678901234", "3A0BEB3EE0A9FA4E0681F8A8A184128A6E303B1B454E1262568E8FC0F29C5E0B", 
+        [InlineData("test 678901234", "115F6F461FCE021A8F747DD17AFBB06B9A78F4D7987102DD3E37537EAB91972A", 
                     false, "QR-code 1")]
-        [InlineData("test 6789012345", "F7ED21EA0EFB9DCC813AA45D1A0ED370AF956F2E12725A58045540248C39C66A", 
+        [InlineData("test 6789012345", "45C0DAEC59A4693A590A4ACB8BAC68E67429F6AE2CD510ED622F6611F890C705", 
                     false, "QR-code 2")]
-        [InlineData("test test test test test test test test test test ", "FFDB4DE6AF778AEB3B0C691B14B205FC904F6ED0667D3149296ABE0B48AAF47F", 
+        [InlineData("test test test test test test test test test test ", "38CC301644350F3CCE2699F6C4F642FAD06D437E9D14B15C00003B4B5D78F39B", 
                     false, "QR-code 2")]
-        [InlineData("test", "AB15C5C89550D796361B85587120CDC0712AF6A9BEF3E77AEC2E9D1634DC0903",
+        [InlineData("test", "A2D9FCAA7833732ED2C4ABD472F0724683FA5561AFFAC94DA6890E2E691A73ED",
                     true, "Minimal QR-code, method 2")]
-        [InlineData("test 678901234", "3A0BEB3EE0A9FA4E0681F8A8A184128A6E303B1B454E1262568E8FC0F29C5E0B",
+        [InlineData("test 678901234", "115F6F461FCE021A8F747DD17AFBB06B9A78F4D7987102DD3E37537EAB91972A",
                     true, "QR-code 1, method 2")]
-        [InlineData("test 6789012345", "F7ED21EA0EFB9DCC813AA45D1A0ED370AF956F2E12725A58045540248C39C66A",
+        [InlineData("test 6789012345", "45C0DAEC59A4693A590A4ACB8BAC68E67429F6AE2CD510ED622F6611F890C705",
                     true, "QR-code 2, method 2")]
-        [InlineData("test test test test test test test test test test ", "FFDB4DE6AF778AEB3B0C691B14B205FC904F6ED0667D3149296ABE0B48AAF47F",
+        [InlineData("test test test test test test test test test test ", "38CC301644350F3CCE2699F6C4F642FAD06D437E9D14B15C00003B4B5D78F39B",
                     true, "QR-code 2, method 2")]
         public void TestAutoSelectVersionsOfQRCode(string text, string hashExpected, bool isMethod2, string caseName)
         {
@@ -99,7 +99,7 @@ namespace Gehtsoft.Barcodes.UnitTests
             else
                 data = BarcodesMaker.GetQRCode(text, QRCodeEncodingMethod.Binary,
                         QRCodeErrorCorrection.M, 1, Color.Black, Color.White);
-            string hash = CalculateSHA2(data);
+            string hash = CalculateImageCanvasHash(data);
             hash.Should().Be(hashExpected);
             Assert.True(true, caseName);
         }
@@ -167,6 +167,24 @@ namespace Gehtsoft.Barcodes.UnitTests
             void call()
             {
                 QRCodesUtils.GetMinVersionForBinaryMode(text, (QRCodeErrorCorrection) correction);
+            }
+        }
+
+        /// <summary>
+        /// Get hash from bitmap canvas
+        /// </summary>
+        /// <param name="dataImage">Byte array of white/black monochrome image</param>
+        /// <returns>string</returns>
+        private string CalculateImageCanvasHash(byte[] dataImage)
+        {
+            using (Bitmap img = new Bitmap(new MemoryStream(dataImage)))
+            {
+                img.Save("delme.png", System.Drawing.Imaging.ImageFormat.Png);
+                byte[] data = new byte[img.Width * img.Height];
+                for (int x = 0; x < img.Width; x++)
+                    for (int y = 0; y < img.Height; y++)
+                        data[x + y * img.Width] = img.GetPixel(x, y).G;
+                return CalculateSHA2(data);
             }
         }
 
