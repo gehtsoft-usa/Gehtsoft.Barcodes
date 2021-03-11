@@ -49,6 +49,8 @@ jobs:
     runs-on: macOS-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Install libgdiplus for System.Drawing support
+        run: brew install mono-libgdiplus
       - name: Run './build.cmd Test'
         run: ./build.cmd Test
       - uses: actions/upload-artifact@v1
