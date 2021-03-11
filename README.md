@@ -28,7 +28,7 @@ Additionally, using the link in the [More Information](More-information) section
 Getting started
 ===============
 
-The easiest way to get started is to install [the available NuGet package](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/).
+The easiest way to get started is to install [the available NuGet package](https://www.nuget.org/packages/Gehtsoft.Barcodes/).
 
 Quick start
 -----------
