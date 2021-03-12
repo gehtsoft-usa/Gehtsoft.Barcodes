@@ -1,6 +1,6 @@
 # Gehtsoft.Barcodes
 
-[![NuGet](https://img.shields.io/nuget/v/Gehtsoft.PDFFlowLib.svg)](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/)
+[![NuGet](https://img.shields.io/nuget/v/Gehtsoft.Barcodes.svg)](https://www.nuget.org/packages/Gehtsoft.Barcodes/)
 
 **Gehtsoft.Barcodes** is a cross-platform C# library for generation of different types of barcodes and QR codes. The goal of the **Gehtsoft.Barcodes** library is to provide .NET application developers with a solution that allows them to create barcodes (including QR codes) quickly.
 
