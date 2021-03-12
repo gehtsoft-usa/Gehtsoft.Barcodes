@@ -1,6 +1,8 @@
 # Gehtsoft.Barcodes
 
-[![NuGet](https://img.shields.io/nuget/v/Gehtsoft.Barcodes.svg)](https://www.nuget.org/packages/Gehtsoft.Barcodes/)
+![NuGet](https://img.shields.io/nuget/v/Gehtsoft.Barcodes?style=for-the-badge)
+![GitHub Workflow Build](https://img.shields.io/github/workflow/status/gehtsoft-usa/Gehtsoft.Barcodes/build/main?style=for-the-badge)
+![GitHub Workflow Test](https://img.shields.io/github/workflow/status/gehtsoft-usa/Gehtsoft.Barcodes/test/main?label=tests&style=for-the-badge)
 
 **Gehtsoft.Barcodes** is a cross-platform C# library for generation of different types of barcodes and QR codes. The goal of the **Gehtsoft.Barcodes** library is to provide .NET application developers with a solution that allows them to create barcodes (including QR codes) quickly.
 
