@@ -150,5 +150,66 @@ namespace Gehtsoft.Barcodes.Examples
 
             FileComparer.AreEqual("etalon_QRCode_2.png", "QRCode_2.png").Should().Be(true);
         }
+
+        [Fact]
+        public void QuickStart_Barcode_Rotation_90_clockwise()
+        {
+            byte[] dataBarcode13 = BarcodesMaker.GetBarcode("0123456789123",
+                                                          BarcodeType.EAN_13,
+                                                          Color.Black,
+                                                          Color.White,
+                                                          true,
+                                                          0,
+                                                          2,
+                                                          true,
+                                                          BarcodeRotation.Clockwise_90);
+            using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
+            {
+                image.Save("rotation_90_clockwise.png", System.Drawing.Imaging.ImageFormat.Png);
+            }
+
+            FileComparer.AreEqual("etalon_rotation_90_clockwise.png", "rotation_90_clockwise.png").Should().Be(true);
+        }
+
+        [Fact]
+        public void QuickStart_Barcode_Rotation_180_clockwise()
+        {
+            byte[] dataBarcode13 = BarcodesMaker.GetBarcode("123456789012",
+                                                          BarcodeType.UPC_A,
+                                                          Color.Black,
+                                                          Color.White,
+                                                          true,
+                                                          0,
+                                                          2,
+                                                          true,
+                                                          BarcodeRotation.Clockwise_180);
+            using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
+            {
+                image.Save("rotation_180_clockwise.png", System.Drawing.Imaging.ImageFormat.Png);
+            }
+
+            FileComparer.AreEqual("etalon_rotation_180_clockwise.png", "rotation_180_clockwise.png").Should().Be(true);
+        }
+
+        [Fact]
+        public void QuickStart_Barcode_Rotation_270_clockwise()
+        {
+        byte[] dataBarcode13 = BarcodesMaker.GetBarcode("ABC0123456789123abc,;.",
+                                                        BarcodeType.GS1_128B,
+                                                        Color.Black,
+                                                        Color.White,
+                                                        true,
+                                                        0,
+                                                        2,
+                                                        true,
+                                                        BarcodeRotation.Clockwise_270);
+        using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
+        {
+            image.Save("rotation_270_clockwise.png", System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+            FileComparer.AreEqual("etalon_rotation_270_clockwise.png", "rotation_270_clockwise.png").Should().Be(true);
+        }
+
     }
 }

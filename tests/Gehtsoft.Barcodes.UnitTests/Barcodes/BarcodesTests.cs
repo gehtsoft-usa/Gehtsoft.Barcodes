@@ -142,15 +142,18 @@ namespace Gehtsoft.Barcodes.UnitTests
         }
 
         [Theory]
-        [InlineData(BarcodeType.EAN_13, MeasureBarcodeType.Percent, 30, 4, true, "Rendering EAN-13, cut 30%")]
-        [InlineData(BarcodeType.EAN_8, MeasureBarcodeType.Pixel, 20, 2, true, "Rendering EAN-8, cut 20 pixels")]
-        [InlineData(BarcodeType.UPC_A, MeasureBarcodeType.Pixel, 0, 3, true, "Rendering UPC-A")]
-        [InlineData(BarcodeType.EAN_13, MeasureBarcodeType.Percent, 30, 4, false, "Rendering EAN-13, cut 30%")]
-        [InlineData(BarcodeType.EAN_8, MeasureBarcodeType.Pixel, 20, 2, false,  "Rendering EAN-8, cut 20 pixels")]
-        [InlineData(BarcodeType.UPC_A, MeasureBarcodeType.Pixel, 0, 3, false, "Rendering UPC-A")]
-        public void Test_Renderer_EAN_UPC(BarcodeType type, MeasureBarcodeType heightToCutType, float heightToCutValue, int scaleMultiplier, bool hasQuiteZones, string caseName)
+        [InlineData(BarcodeType.EAN_13, MeasureBarcodeType.Percent, 30, 4, true, false, "Rendering EAN-13, cut 30%")]
+        [InlineData(BarcodeType.EAN_8, MeasureBarcodeType.Pixel, 20, 2, true, false,  "Rendering EAN-8, cut 20 pixels")]
+        [InlineData(BarcodeType.UPC_A, MeasureBarcodeType.Pixel, 0, 3, true, false,  "Rendering UPC-A")]
+        [InlineData(BarcodeType.EAN_13, MeasureBarcodeType.Percent, 30, 4, false, true, "Rendering EAN-13, cut 30%, rotate 90")]
+        [InlineData(BarcodeType.EAN_8, MeasureBarcodeType.Pixel, 20, 2, false, true, "Rendering EAN-8, cut 20 pixels, rotate 90")]
+        [InlineData(BarcodeType.UPC_A, MeasureBarcodeType.Pixel, 0, 3, false, true, "Rendering UPC-A, rotate 90")]
+        public void Test_Renderer_EAN_UPC(BarcodeType type, MeasureBarcodeType heightToCutType, float heightToCutValue, int scaleMultiplier, bool hasQuiteZones, bool rotate90, string caseName)
         {
             MeasureBarcodeUnit heightToCut = new MeasureBarcodeUnit(heightToCutValue, heightToCutType);
+            BarcodeRotation rotation = BarcodeRotation.Clockwise_0;
+            if (rotate90)
+                rotation = BarcodeRotation.Clockwise_90;
             switch (type)
             {
                 case BarcodeType.EAN_13:                   
@@ -160,13 +163,21 @@ namespace Gehtsoft.Barcodes.UnitTests
                     Bitmap bitmap = BarcodesRenderer.DrawBitmapEAN_UPC(
                         BarcodesTestData.encodedTestDataEAN_13,
                         BarcodesTestData.inputTestStringEAN_13,
-                        type, heightToCut, true, scaleMultiplier, null, null, hasQuiteZones);
+                        type, heightToCut, true, scaleMultiplier, null, null, hasQuiteZones, rotation);
                     if (!hasQuiteZones)
                     {
                         widthShould = widthShould - (EANData.left_quite_zone_count_EAN_13 + EANData.right_quite_zone_count) * scaleMultiplier;
                     }
-                    bitmap.Width.Should().Be(widthShould);
-                    bitmap.Height.Should().Be(heightShould);
+                    if (rotate90)
+                    {
+                        bitmap.Width.Should().Be(heightShould);
+                        bitmap.Height.Should().Be(widthShould);
+                    }
+                    else
+                    {
+                        bitmap.Width.Should().Be(widthShould);
+                        bitmap.Height.Should().Be(heightShould);
+                    }
                     break;
                 case BarcodeType.EAN_8:
                     widthShould = EANData.default_barcode_width_EAN_8 * scaleMultiplier;
@@ -175,13 +186,21 @@ namespace Gehtsoft.Barcodes.UnitTests
                     bitmap = BarcodesRenderer.DrawBitmapEAN_UPC(
                         BarcodesTestData.encodedTestDataEAN_8,
                         BarcodesTestData.inputTestStringEAN_8,
-                        type, heightToCut, true, scaleMultiplier, null, null, hasQuiteZones);
+                        type, heightToCut, true, scaleMultiplier, null, null, hasQuiteZones, rotation);
                     if (!hasQuiteZones)
                     {
                         widthShould = widthShould - (EANData.left_quite_zone_count_EAN_8 + EANData.right_quite_zone_count) * scaleMultiplier;
                     }
-                    bitmap.Width.Should().Be(widthShould);
-                    bitmap.Height.Should().Be(heightShould);
+                    if (rotate90)
+                    {
+                        bitmap.Width.Should().Be(heightShould);
+                        bitmap.Height.Should().Be(widthShould);
+                    }
+                    else
+                    {
+                        bitmap.Width.Should().Be(widthShould);
+                        bitmap.Height.Should().Be(heightShould);
+                    }
                     break;
                 case BarcodeType.UPC_A:
                     widthShould = EANData.default_barcode_width_EAN_13 * scaleMultiplier;
@@ -190,13 +209,21 @@ namespace Gehtsoft.Barcodes.UnitTests
                     bitmap = BarcodesRenderer.DrawBitmapEAN_UPC(
                         BarcodesTestData.encodedTestDataUPC_A,
                         BarcodesTestData.inputTestStringUPC_A,
-                        type, heightToCut, true, scaleMultiplier, null, null, hasQuiteZones);
+                        type, heightToCut, true, scaleMultiplier, null, null, hasQuiteZones, rotation);
                     if (!hasQuiteZones)
                     {
                         widthShould = widthShould - (EANData.left_quite_zone_count_EAN_13 + EANData.right_quite_zone_count) * scaleMultiplier;
                     }
-                    bitmap.Width.Should().Be(widthShould);
-                    bitmap.Height.Should().Be(heightShould); 
+                    if (rotate90)
+                    {
+                        bitmap.Width.Should().Be(heightShould);
+                        bitmap.Height.Should().Be(widthShould);
+                    }
+                    else
+                    {
+                        bitmap.Width.Should().Be(widthShould);
+                        bitmap.Height.Should().Be(heightShould);
+                    }
                     break;
             }
 
@@ -204,19 +231,22 @@ namespace Gehtsoft.Barcodes.UnitTests
         }
 
         [Theory]
-        [InlineData(BarcodeType.GS1_128A, MeasureBarcodeType.Percent, 30, 4, true, "Rendering GS1-128A, cut 30%")]
-        [InlineData(BarcodeType.GS1_128B, MeasureBarcodeType.Pixel, 20, 2, true, "Rendering GS1-128B, cut 20 pixels")]
-        [InlineData(BarcodeType.GS1_128C, MeasureBarcodeType.Pixel, 0, 3, true, "Rendering GS1-128C")]
-        [InlineData(BarcodeType.GS1_128A, MeasureBarcodeType.Percent, 30, 4, false, "Rendering GS1-128A, cut 30%")]
-        [InlineData(BarcodeType.GS1_128B, MeasureBarcodeType.Pixel, 20, 2, false, "Rendering GS1-128B, cut 20 pixels")]
-        [InlineData(BarcodeType.GS1_128C, MeasureBarcodeType.Pixel, 0, 3, false, "Rendering GS1-128C")]
-        public void Test_Renderer_GS1_128(BarcodeType type, MeasureBarcodeType heightToCutType, float heightToCutValue, int scaleMultiplier, bool hasQuiteZones, string caseName)
+        [InlineData(BarcodeType.GS1_128A, MeasureBarcodeType.Percent, 30, 4, true, false, "Rendering GS1-128A, cut 30%")]
+        [InlineData(BarcodeType.GS1_128B, MeasureBarcodeType.Pixel, 20, 2, true, false, "Rendering GS1-128B, cut 20 pixels")]
+        [InlineData(BarcodeType.GS1_128C, MeasureBarcodeType.Pixel, 0, 3, true, false, "Rendering GS1-128C")]
+        [InlineData(BarcodeType.GS1_128A, MeasureBarcodeType.Percent, 30, 4, false, true, "Rendering GS1-128A, cut 30%, rotate 270")]
+        [InlineData(BarcodeType.GS1_128B, MeasureBarcodeType.Pixel, 20, 2, false, true, "Rendering GS1-128B, cut 20 pixels, rotate 270")]
+        [InlineData(BarcodeType.GS1_128C, MeasureBarcodeType.Pixel, 0, 3, false, true, "Rendering GS1-128C, rotate 270")]
+        public void Test_Renderer_GS1_128(BarcodeType type, MeasureBarcodeType heightToCutType, float heightToCutValue, int scaleMultiplier, bool hasQuiteZones, bool rotate270, string caseName)
         {
             MeasureBarcodeUnit heightToCut = new MeasureBarcodeUnit(heightToCutValue, heightToCutType);
             float labelHeight = scaleMultiplier * 2;
-            int widthShould = 0;
+            int widthShould;
             Font labelFont = new Font(GS1_128Data.font_family_name, GS1_128Data.default_font_size * scaleMultiplier);
             labelHeight += labelFont.Size;
+            BarcodeRotation rotation = BarcodeRotation.Clockwise_0;
+            if (rotate270)
+                rotation = BarcodeRotation.Clockwise_270;
             switch (type)
             {
                 case BarcodeType.GS1_128A:
@@ -231,9 +261,17 @@ namespace Gehtsoft.Barcodes.UnitTests
                         BarcodesTestData.encodedTestDataGS1_128A,
                         BarcodesTestData.inputTestStringGS1_128A,
                         heightToCut,
-                        true, scaleMultiplier, null, null, hasQuiteZones);
-                    bitmap.Width.Should().Be(widthShould);
-                    bitmap.Height.Should().Be(heightShould);
+                        true, scaleMultiplier, null, null, hasQuiteZones, rotation);
+                    if (rotate270)
+                    {
+                        bitmap.Width.Should().Be(heightShould);
+                        bitmap.Height.Should().Be(widthShould);
+                    }
+                    else
+                    {
+                        bitmap.Width.Should().Be(widthShould);
+                        bitmap.Height.Should().Be(heightShould);
+                    }
                     break;
                 case BarcodeType.GS1_128B:
                     if (hasQuiteZones)
@@ -247,12 +285,19 @@ namespace Gehtsoft.Barcodes.UnitTests
                         BarcodesTestData.encodedTestDataGS1_128B,
                         BarcodesTestData.inputTestStringGS1_128B,
                         heightToCut,
-                        true, scaleMultiplier, null, null, hasQuiteZones);
-                    bitmap.Width.Should().Be(widthShould);
-                    bitmap.Height.Should().Be(heightShould);
+                        true, scaleMultiplier, null, null, hasQuiteZones, rotation);
+                    if (rotate270)
+                    {
+                        bitmap.Width.Should().Be(heightShould);
+                        bitmap.Height.Should().Be(widthShould);
+                    }
+                    else
+                    {
+                        bitmap.Width.Should().Be(widthShould);
+                        bitmap.Height.Should().Be(heightShould);
+                    }
                     break;
                 case BarcodeType.GS1_128C:
-                    widthShould = (GS1_128Data.QuietZoneMinimumWidth * 2 + BarcodesTestData.encodedTestDataGS1_128C.Length) * scaleMultiplier;
                     if (hasQuiteZones)
                         widthShould = (GS1_128Data.QuietZoneMinimumWidth * 2 + BarcodesTestData.encodedTestDataGS1_128C.Length) * scaleMultiplier;
                     else
@@ -264,9 +309,17 @@ namespace Gehtsoft.Barcodes.UnitTests
                         BarcodesTestData.encodedTestDataGS1_128C,
                         BarcodesTestData.inputTestStringGS1_128C,
                         heightToCut,
-                        true, scaleMultiplier, null, null, hasQuiteZones);
-                    bitmap.Width.Should().Be(widthShould);
-                    bitmap.Height.Should().Be(heightShould);
+                        true, scaleMultiplier, null, null, hasQuiteZones, rotation);
+                    if (rotate270)
+                    {
+                        bitmap.Width.Should().Be(heightShould);
+                        bitmap.Height.Should().Be(widthShould);
+                    }
+                    else
+                    {
+                        bitmap.Width.Should().Be(widthShould);
+                        bitmap.Height.Should().Be(heightShould);
+                    }
                     break;
             }
             Assert.True(true, caseName);

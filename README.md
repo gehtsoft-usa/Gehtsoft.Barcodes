@@ -15,12 +15,12 @@ Main features
 =============
 
 Currently the library supports generation of the following types of barcodes and QR codes: 
-- EAN8
-- EAN13
+- EAN-8
+- EAN-13
 - GS1-128A
 - GS1-128B
 - GS1-128C
-- UPC_A
+- UPC-A
 - QR codes
 
 Additionally, using the link in the [More Information](More-information) section, you can get our other proprietary library for generating PDF documents with convenient integration. Using the **GS PDFFlow** library, you can easily add barcodes to simple and complex documents.
@@ -90,6 +90,98 @@ public class QuickStart
         {
             image.Save("QRCode.png", System.Drawing.Imaging.ImageFormat.Png);
         }
+		
+        byte[] dataBarcode8 = BarcodesMaker.GetBarcode("01234567",
+                                                        BarcodeType.EAN_8,
+                                                        Color.Blue,
+                                                        Color.Yellow,
+                                                        true,
+                                                        MeasureBarcodeUnit.FromPixel(0),
+                                                        2,
+                                                        false);
+        using (Image image = Image.FromStream(new MemoryStream(dataBarcode8)))
+        {
+            image.Save("barcodeEAN8_2.png", System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        byte[] dataBarcode13 = BarcodesMaker.GetBarcode("0123456789123",
+                                                        BarcodeType.EAN_13,
+                                                        Color.Green,
+                                                        Color.White,
+                                                        true,
+                                                        MeasureBarcodeUnit.FromPixel(0),
+                                                        2,
+                                                        false);
+        using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
+        {
+            image.Save("barcodeEAN13_2.png", System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        byte[] dataBarcodeGS128 = BarcodesMaker.GetBarcode("012345678912ABCD",
+                                                        BarcodeType.GS1_128A,
+                                                        Color.Red,
+                                                        Color.Gray,
+                                                        true,
+                                                        MeasureBarcodeUnit.FromPixel(0),
+                                                        2, 
+                                                        false);
+        using (Image image = Image.FromStream(new MemoryStream(dataBarcodeGS128)))
+        {
+            image.Save("barcodeGS128_2.png", System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        byte[] dataQR = BarcodesMaker.GetQRCode("QRCode example",
+                                                QRCodeEncodingMethod.Binary,
+                                                QRCodeErrorCorrection.M,
+                                                8, 
+                                                Color.Black, Color.Green, 
+                                                false);
+        using (Image image = Image.FromStream(new MemoryStream(dataQR)))
+        {
+            image.Save("QRCode_2.png", System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        byte[] dataBarcode13 = BarcodesMaker.GetBarcode("0123456789123",
+                                                        BarcodeType.EAN_13,
+                                                        Color.Black,
+                                                        Color.White,
+                                                        true,
+                                                        0,
+                                                        2,
+                                                        true,
+                                                        BarcodeRotation.Clockwise_90);
+        using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
+        {
+            image.Save("rotation_90_clockwise.png", System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        byte[] dataBarcode13 = BarcodesMaker.GetBarcode("123456789012",
+                                                        BarcodeType.UPC_A,
+                                                        Color.Black,
+                                                        Color.White,
+                                                        true,
+                                                        0,
+                                                        2,
+                                                        true,
+                                                        BarcodeRotation.Clockwise_180);
+        using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
+        {
+            image.Save("rotation_180_clockwise.png", System.Drawing.Imaging.ImageFormat.Png);
+        }
+
+        byte[] dataBarcode13 = BarcodesMaker.GetBarcode("ABC0123456789123abc,;.",
+                                                        BarcodeType.GS1_128B,
+                                                        Color.Black,
+                                                        Color.White,
+                                                        true,
+                                                        0,
+                                                        2,
+                                                        true,
+                                                        BarcodeRotation.Clockwise_270);
+        using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
+        {
+            image.Save("rotation_270_clockwise.png", System.Drawing.Imaging.ImageFormat.Png);
+        }		
     }
 }
 ```
@@ -99,19 +191,25 @@ Parameters
 ----------
 
 List of parameters of user API methods:  
+
+EAN8, EAN13, UPC-A, GS1-128A, GS1-128B, GS1-128C barcodes:
 - data - the input data for the barcode. 
 - barcodeType - the barcode type.  
 - lineColor - the color of barcode lines.  
 - backColor - the background color.  
 - showDataLabel - defines whether the input data is printed under the barcode lines.  
-- heightToCut - the height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.  
-- barcodeWidthMultiplier - the pixel scaling of the resulting barcode image.  
+- heightToCut - the height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.    
+- scaleMultiplier - the pixel scaling of the resulting barcode image.
+- hasQuietZones - defines whether the barcode has quiet zones. 
+- barcodeRotation - defines barcode rotation angle.
+
+QR codes:
 - encoding - the QR code encoding.  
 - levelCorrection - the level of error correction.  
-- scaleMultiplier - the pixel scaling of the resulting QR code image.  
 - foregroundColor - the QR code color.  
 - backgroundColor - the background color.  
-- hasQuietZone - defines whether the QR code has a quiet zone.
+- scaleMultiplier - the pixel scaling of the resulting QRcode image.
+- hasQuietZones - defines whether the QR code has quiet zones. 
 
 More information
 ================

@@ -21,16 +21,17 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="barcodeType">The barcode type.</param>
         /// <param name="strokeColor">The color of barcode lines.</param>
         /// <param name="backColor">The background color.</param>
-        /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
+        /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
         /// <param name="showDataLabel">Defines whether to print the barcode data under the lines.</param>
         /// <param name="textDataString">The text to be printed under the barcode lines.</param>
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines. Can be 0.</param>
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
+        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Byte array</returns>
-        internal static byte[] GetBarcodeImageEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
+        internal static byte[] GetBarcodeImageEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Draw barcode on bitmap:
-            Bitmap bitmap = DrawBitmapEAN_UPC(encodedData, textDataString, barcodeType, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones);
+            Bitmap bitmap = DrawBitmapEAN_UPC(encodedData, textDataString, barcodeType, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones, barcodeRotation);
             // Save bitmap to a byte array:
             using (var memStream = new MemoryStream())
             {
@@ -48,15 +49,16 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="showDataLabel">Defines whether to print the barcode data under the lines.</param>
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <param name="backColor">The background color.</param>
-        /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
+        /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
         /// <param name="strokeColor">The color of barcode lines.</param>
+        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns></returns>
         internal static byte[] GetBarcodeImageGS1_128(byte[] encodedData, string textDataString,
             MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 2,
-            Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
+            Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Draw barcode on bitmap:
-            Bitmap bitmap = DrawBitmapGS1_128(encodedData, textDataString, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones);
+            Bitmap bitmap = DrawBitmapGS1_128(encodedData, textDataString, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones, barcodeRotation);
             // Save bitmap to a byte array:
             using (var memStream = new MemoryStream())
             {
@@ -76,9 +78,12 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="textDataString">The text to be printed under the barcode lines.</param>
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines. Can be 0.</param>
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
-        /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
+        /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
+        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Bitmap</returns>
-        internal static Bitmap DrawBitmapEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, MeasureBarcodeUnit heightToCut, bool showDataLabel, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true)
+        internal static Bitmap DrawBitmapEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, 
+            MeasureBarcodeUnit heightToCut, bool showDataLabel, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, 
+            bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Bitmap accepts only integer values:
             int barcodeWidth;
@@ -273,7 +278,7 @@ namespace Gehtsoft.Barcodes.Rendering
                     }
 
                     // Print the first and the last digits for UPC-A:
-                    if (barcodeType == BarcodeType.UPC_A)
+                    if ((barcodeType == BarcodeType.UPC_A) && hasQuietZones)
                     {
                         digitsPath.AddString(textDataString.Substring(0, 1), labelFontSmall.FontFamily, (int)labelFontSmall.Style, labelFontSmall.Size,
                         new RectangleF(
@@ -298,6 +303,19 @@ namespace Gehtsoft.Barcodes.Rendering
                 }
             }
 
+           switch(barcodeRotation)
+            {
+                case BarcodeRotation.Clockwise_90:
+                    bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    break;
+                case BarcodeRotation.Clockwise_180:
+                    bitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                    break;
+                case BarcodeRotation.Clockwise_270:
+                    bitmap.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                    break;
+            }
+
             return bitmap;
         }
 
@@ -310,12 +328,14 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="showDataLabel">Defines whether to print the barcode data under the lines.</param>
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <param name="backColor">The background color.</param>
-        /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
+        /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
         /// <param name="strokeColor">The color of barcode lines.</param>
+        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Bitmap</returns>
         internal static Bitmap DrawBitmapGS1_128(byte[] encodedData, string textDataString,
             MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 2,
-            Color? strokeColor = null, Color ? backColor = null, bool hasQuietZones = true)
+            Color? strokeColor = null, Color ? backColor = null, bool hasQuietZones = true, 
+            BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {            
             int halfBarItemWidth = scaleMultiplier / 2;
 
@@ -401,6 +421,19 @@ namespace Gehtsoft.Barcodes.Rendering
 
                     graphics.FillPath(labelBrush, labelPath);
                 }
+            }
+
+            switch (barcodeRotation)
+            {
+                case BarcodeRotation.Clockwise_90:
+                    bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                    break;
+                case BarcodeRotation.Clockwise_180:
+                    bitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                    break;
+                case BarcodeRotation.Clockwise_270:
+                    bitmap.RotateFlip(RotateFlipType.Rotate270FlipNone);
+                    break;
             }
 
             return bitmap;

@@ -36,9 +36,9 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="scaleMultiplier">The pixel scaling of the resulting QR code image.</param>
         /// <param name="foregroundColor">The QR code color.</param>
         /// <param name="backgroundColor">The background color.</param>
-        /// <param name="hasQuietZone">Defines whether the QR code has a "quiet zone".</param>
+        /// <param name="hasQuietZones">Defines whether the QR code has a "quiet zone".</param>
         /// <returns>byte[]</returns>
-        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, QRCodeVersion version, int scaleMultiplier, Color foregroundColor, Color backgroundColor, bool hasQuietZone = true)
+        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, QRCodeVersion version, int scaleMultiplier, Color foregroundColor, Color backgroundColor, bool hasQuietZones = true)
         {
             // Validation
             if (string.IsNullOrEmpty(data))
@@ -52,7 +52,7 @@ namespace Gehtsoft.Barcodes.UserAPI
             if (scaleMultiplier <= 0)
                 throw new ArgumentOutOfRangeException(nameof(scaleMultiplier));
             // Results
-            return QRCodesRenderer.GetQRCodeImage(data, encoding, levelCorrection, version, scaleMultiplier, foregroundColor, backgroundColor, hasQuietZone ? 4 : 0);
+            return QRCodesRenderer.GetQRCodeImage(data, encoding, levelCorrection, version, scaleMultiplier, foregroundColor, backgroundColor, hasQuietZones ? 4 : 0);
         }
 
         /// <summary>
@@ -64,15 +64,15 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="scaleMultiplier">The pixel scaling of the resulting QR code image.</param>
         /// <param name="foregroundColor">The QR code color.</param>
         /// <param name="backgroundColor">The background color.</param>
-        /// <param name="hasQuietZone">Defines whether the QR code has a "quiet zone".</param>
+        /// <param name="hasQuietZones">Defines whether the QR code has a "quiet zone".</param>
         /// <returns>byte[]</returns>
-        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, int scaleMultiplier, Color foregroundColor, Color backgroundColor, bool hasQuietZone = true)
+        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, int scaleMultiplier, Color foregroundColor, Color backgroundColor, bool hasQuietZones = true)
         {
             return GetQRCode(data, encoding, levelCorrection,
                 QRCodesUtils.GetMinVersionForBinaryMode(data, levelCorrection),
                 scaleMultiplier,
                 foregroundColor, backgroundColor,
-                hasQuietZone);
+                hasQuietZones);
         }
 
         /// <summary>

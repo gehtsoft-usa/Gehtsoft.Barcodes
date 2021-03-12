@@ -4,7 +4,7 @@ using Gehtsoft.Barcodes.Enums;
 using Gehtsoft.Barcodes.Utils;
 using Xunit;
 
-namespace Gehtsoft.Barcodes.UnitTests.Barcodes
+namespace Gehtsoft.Barcodes.UnitTests
 {
     public class BarcodesUtilsTests
     {

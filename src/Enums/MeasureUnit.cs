@@ -42,6 +42,13 @@
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="MeasureBarcodeUnit"/> class in pixels.
+        /// </summary>
+        /// <param name="value">The measurement unit value in pixels</param>
+        public static implicit operator MeasureBarcodeUnit(float value) => 
+            new MeasureBarcodeUnit(value, MeasureBarcodeType.Pixel);
+
+        /// <summary>
         /// Creates MeasureBarcodeUnit with value in pixels
         /// </summary>
         /// <param name="value">Value in pixels</param>

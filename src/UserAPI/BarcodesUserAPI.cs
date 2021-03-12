@@ -17,9 +17,10 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="showDataLabel">Defines whether the input data is printed under the barcode lines.</param>
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.</param>     
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
-        /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
+        /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
+        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>     
-        public static byte[] GetBarcode(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true)
+        public static byte[] GetBarcode(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Validate the data depending on barcodeType:
             BarcodesUtils.ValidateBarcodeData(data, barcodeType);
@@ -29,12 +30,12 @@ namespace Gehtsoft.Barcodes.UserAPI
 
             if (barcodeType == BarcodeType.EAN_8 || barcodeType == BarcodeType.EAN_13 || barcodeType == BarcodeType.UPC_A)
             {             
-                byte[] imgData = GetBarcodeEAN_UPC(data, barcodeType, lineColor, backColor, showDataLabel, heightToCut, scaleMultiplier, hasQuietZones);
+                byte[] imgData = GetBarcodeEAN_UPC(data, barcodeType, lineColor, backColor, showDataLabel, heightToCut, scaleMultiplier, hasQuietZones, barcodeRotation);
                 return imgData;
             }
             else
             {               
-                byte[] imgData = GetBarcodeGS1_128(data, barcodeType, lineColor, backColor, showDataLabel, heightToCut, scaleMultiplier, hasQuietZones);
+                byte[] imgData = GetBarcodeGS1_128(data, barcodeType, lineColor, backColor, showDataLabel, heightToCut, scaleMultiplier, hasQuietZones, barcodeRotation);
                 return imgData;
             }
         }
@@ -49,15 +50,16 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="showDataLabel">Defines whether the input data is printed under the barcode lines.</param>
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.</param>      
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
-        /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
+        /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
+        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>
-        internal static byte[] GetBarcodeEAN_UPC(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true)
+        internal static byte[] GetBarcodeEAN_UPC(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Process the data and encode it:
             byte[] encodedData = BarcodesEncoder.EncodeBarcodeDataEAN_UPC(data, barcodeType);
 
             // Create an image using encodedData and save the image to a byte array:  
-            byte[] imgData = BarcodesRenderer.GetBarcodeImageEAN_UPC(encodedData, data, barcodeType, showDataLabel, heightToCut, scaleMultiplier, lineColor, backColor, hasQuietZones);
+            byte[] imgData = BarcodesRenderer.GetBarcodeImageEAN_UPC(encodedData, data, barcodeType, showDataLabel, heightToCut, scaleMultiplier, lineColor, backColor, hasQuietZones, barcodeRotation);
             return imgData;
         }
 
@@ -71,16 +73,17 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="showDataLabel">Defines whether the input data is printed under the barcode lines.</param>
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.</param>
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
-        /// <param name="hasQuietZones">Defines whether the QR code has quiet zones.</param>
+        /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
+        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>
 
-        internal static byte[] GetBarcodeGS1_128(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true)
+        internal static byte[] GetBarcodeGS1_128(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Process the data and encode it:
             byte[] encodedData = BarcodesEncoder.EncodeBarcodeDataGS1_128(data, barcodeType);
             
             // Create an image using encodedData and save the image to a byte array:
-            byte[] imgData = BarcodesRenderer.GetBarcodeImageGS1_128(encodedData, data, heightToCut, showDataLabel, scaleMultiplier, strokeColor: lineColor, backColor: backColor, hasQuietZones);
+            byte[] imgData = BarcodesRenderer.GetBarcodeImageGS1_128(encodedData, data, heightToCut, showDataLabel, scaleMultiplier, strokeColor: lineColor, backColor: backColor, hasQuietZones, barcodeRotation);
             return imgData;
         }
     }
