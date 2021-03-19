@@ -18,7 +18,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.</param>     
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
-        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
+        /// <param name="barcodeRotation">The barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>     
         public static byte[] GetBarcode(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
@@ -51,7 +51,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.</param>      
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
-        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
+        /// <param name="barcodeRotation">The barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>
         internal static byte[] GetBarcodeEAN_UPC(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
@@ -74,7 +74,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="heightToCut">The height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.</param>
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
-        /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
+        /// <param name="barcodeRotation">The barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>
 
         internal static byte[] GetBarcodeGS1_128(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
