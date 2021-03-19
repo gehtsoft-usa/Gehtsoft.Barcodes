@@ -13,8 +13,7 @@ The following platforms are supported:
 * .NET Framework 4.5.1 and later
 * .NET Standard 2.0
 
-Main features
-=============
+# Main features
 
 Currently the library supports generation of the following types of barcodes and QR codes: 
 - EAN-8
@@ -25,15 +24,13 @@ Currently the library supports generation of the following types of barcodes and
 - UPC-A
 - QR codes
 
-Additionally, using the link in the [More Information](More-information) section, you can get our other proprietary library for generating PDF documents with convenient integration. Using the **GS PDFFlow** library, you can easily add barcodes to simple and complex documents.
+Additionally, using the link in the [More Information](#more-information) section, you can get our other proprietary library for generating PDF documents with convenient integration. Using the **GS PDFFlow** library, you can easily add barcodes to simple and complex documents.
 
-Getting started
-===============
+# Getting started
 
 The easiest way to get started is to install [the available NuGet package](https://www.nuget.org/packages/Gehtsoft.Barcodes/).
 
-Quick start
------------
+## Quick start
 
 You need to connect links to the project:
 ``` c#
@@ -187,10 +184,9 @@ public class QuickStart
     }
 }
 ```
-We have successfully saved the barcode images: EAN8, EAN13, GS1-128, QR Code. 
+We have successfully saved the barcode images: EAN8, EAN13, GS1-128, QR Code.
 
-Parameters
-----------
+## Parameters
 
 List of parameters of user API methods:  
 
@@ -211,24 +207,21 @@ QR codes:
 - foregroundColor - the QR code color.  
 - backgroundColor - the background color.  
 - scaleMultiplier - the pixel scaling of the resulting QRcode image.
-- hasQuietZones - defines whether the QR code has quiet zones. 
+- hasQuietZones - defines whether the QR code has quiet zones.
 
-More information
-================
+# More information
 
 For more information about **Gehtsoft.Barcodes**, follow these links: 
 
-* If you need to use barcodes or QR codes in PDF documents, we offer our own [Gehtsoft PDFFlow library](https://www.nuget.org/packages/Gehtsoft.PDFFlowlib) for efficient, quick and easy creation of PDF documents of any complexity. [Gehtsoft.PDFFlowLib](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/) is an excellent C# library that allows developers to easily generate complex documents for real business applications. [PDFFlow](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/) utilizes the **Gehtsoft.Barcodes** library to generate barcodes and QR codes and offers many additional formatting and layouting options. 
+* If you need to use barcodes or QR codes in PDF documents, we offer our own [Gehtsoft PDFFlow library](https://www.nuget.org/packages/Gehtsoft.PDFFlowlib) for efficient, quick and easy creation of PDF documents of any complexity. [Gehtsoft.PDFFlow](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/) is an excellent C# library that allows developers to easily generate complex documents for real business applications. [PDFFlow](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/) utilizes the **Gehtsoft.Barcodes** library to generate barcodes and QR codes and offers many additional formatting and layouting options.
 
-Contacts
-========
+# Contacts
 
 To report issues with the library or request changes or features, please open an issue at <https://github.com/gehtsoft-usa/Gehtsoft.Barcodes/issues>.
 
 We welcome contributions to the project. Please contact us at <contact@gehtsoftusa.com> if you would like to include your work in the library.
 
-License
-=======
+# License
 
 The library is shared under GNU LGPL license and is free to use. Please consult the GNU LGPL license for details on proper usage of the library.
 
