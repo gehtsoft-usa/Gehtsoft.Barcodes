@@ -4,6 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <LangVersion>latestmajor</LangVersion>
     <DocumentationFile>bin/barcodes_doc.xml</DocumentationFile>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
