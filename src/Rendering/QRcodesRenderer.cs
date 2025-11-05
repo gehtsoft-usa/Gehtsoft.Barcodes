@@ -1,5 +1,4 @@
-using System.Drawing;
-using System.Drawing.Drawing2D;
+using SkiaSharp;
 using System.IO;
 using Gehtsoft.Barcodes.Data;
 using Gehtsoft.Barcodes.Encoding;
@@ -26,7 +25,7 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="backgroundColor">The background color.</param>
         /// <param name="quietZone">The size of the quiet zone.</param>
         /// <returns>byte[]</returns>
-        internal static byte[] GetQRCodeImage(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, QRCodeVersion version, int scaleMultiplier, Color foregroundColor, Color backgroundColor, int quietZone = 4)
+        internal static byte[] GetQRCodeImage(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, QRCodeVersion version, int scaleMultiplier, SKColor foregroundColor, SKColor backgroundColor, int quietZone = 4)
         {
             if (!Enum.IsDefined(typeof(QRCodeVersion), version))
                 throw new ArgumentOutOfRangeException();
@@ -49,67 +48,66 @@ namespace Gehtsoft.Barcodes.Rendering
             byte[] dataBinary = QRCodesEncoder.EncodeQRCodeData(data, numVersion, levelCorrection);
 
             // Create a bitmap for the QR code
-            var bitmapSource = CreateBitmap(dataBinary, numVersion, numberMask, levelCorrection, 
-                                            new SolidBrush(foregroundColor), 
-                                            new SolidBrush(backgroundColor), 
-                                            quietZone);
-            // Pixel scaling
-
-            var bitmap = QRCodesUtils.Scale(bitmapSource, scaleMultiplier);
-
-            // Save the resulting image in the PNG format
-            var memStream = new MemoryStream();
-            bitmap.Save(memStream, System.Drawing.Imaging.ImageFormat.Png);
-            memStream.Flush();
-            var qrData = memStream.ToArray();
-            memStream.Close();
-            return qrData;
+            using (var bitmapSource = CreateBitmap(dataBinary, numVersion, numberMask, levelCorrection,
+                                            foregroundColor,
+                                            backgroundColor,
+                                            quietZone))
+            {
+                // Pixel scaling
+                using (var bitmap = QRCodesUtils.Scale(bitmapSource, scaleMultiplier))
+                {
+                    // Save the resulting image in the PNG format
+                    using (var memStream = new MemoryStream())
+                    using (var image = SKImage.FromBitmap(bitmap))
+                    using (var encoded = image.Encode(SKEncodedImageFormat.Png, 100))
+                    {
+                        encoded.SaveTo(memStream);
+                        return memStream.ToArray();
+                    }
+                }
+            }
         }
 
-        private static Bitmap CreateBitmap(byte[] dataBinary, int version, int numberMask, QRCodeErrorCorrection levelCorrection, Brush foregroundColor, Brush backgroundColor, int margin)
+        private static SKBitmap CreateBitmap(byte[] dataBinary, int version, int numberMask, QRCodeErrorCorrection levelCorrection, SKColor foregroundColor, SKColor backgroundColor, int margin)
         {
-            var foregroundBrush = (SolidBrush)foregroundColor;
             int sizeCanvas = 21 + 4 * (version - 1);
             int size = sizeCanvas + 2 * margin;
-            var image = new Bitmap(size, size);
-            var imageMaskQRCode = new Bitmap(size, size); // system zones
+            var image = new SKBitmap(size, size, SKColorType.Rgba8888, SKAlphaType.Premul);
+            var imageMaskQRCode = new SKBitmap(size, size, SKColorType.Rgba8888, SKAlphaType.Premul); // system zones
 
             // Create a base system template
-            using (Graphics graph = Graphics.FromImage(image))
+            using (var canvas = new SKCanvas(image))
+            using (var canvasMask = new SKCanvas(imageMaskQRCode))
+            using (var foregroundPaint = new SKPaint { Color = foregroundColor, Style = SKPaintStyle.Fill })
+            using (var backgroundPaint = new SKPaint { Color = backgroundColor, Style = SKPaintStyle.Fill })
             {
-                using (Graphics graphMaskQRCode = Graphics.FromImage(imageMaskQRCode))
-                {
-                    graph.InterpolationMode = InterpolationMode.NearestNeighbor;
-                    graph.SmoothingMode = SmoothingMode.None;
-                    graph.PixelOffsetMode = PixelOffsetMode.Half;
-                    graph.PageUnit = GraphicsUnit.Pixel;
-                    graph.FillRectangle(backgroundColor, 
-                                        new RectangleF(0, 0, image.Width, image.Height));
-                    AddTemplateToGraphics(graph, graphMaskQRCode, version, sizeCanvas, 
-                                          foregroundColor, backgroundColor, margin);
-                    AddLevelDataToMask(graphMaskQRCode, sizeCanvas, margin);
-                }
+                canvas.Clear(backgroundColor);
+                canvasMask.Clear(SKColors.Transparent);
+
+                AddTemplateToCanvas(canvas, canvasMask, version, sizeCanvas,
+                                      foregroundPaint, backgroundPaint, margin);
+                AddLevelDataToMask(canvasMask, sizeCanvas, margin);
             }
 
             // Add sync lines to the image
             AddSyncToImage(image, imageMaskQRCode, sizeCanvas,
-                           foregroundBrush, margin);
+                           foregroundColor, margin);
 
             // Add the version code to the image
-            AddVersionDataToImage(image, imageMaskQRCode, version, sizeCanvas, 
-                                  foregroundBrush.Color, margin);
+            AddVersionDataToImage(image, imageMaskQRCode, version, sizeCanvas,
+                                  foregroundColor, margin);
 
             // Add the data to the image
-            AddBinaryDataToImage(image, imageMaskQRCode, dataBinary, sizeCanvas, 
-                                 foregroundBrush, numberMask, margin);
+            AddBinaryDataToImage(image, imageMaskQRCode, dataBinary, sizeCanvas,
+                                 foregroundColor, numberMask, margin);
 
             // Add the code of the selected correction level and mask
-            AddLevelAndMaskCodes(image, numberMask, levelCorrection, sizeCanvas, 
-                                 foregroundBrush.Color, margin);
+            AddLevelAndMaskCodes(image, numberMask, levelCorrection, sizeCanvas,
+                                 foregroundColor, margin);
             return image;
         }
 
-        private static void AddLevelAndMaskCodes(Bitmap image, int numberMask, QRCodeErrorCorrection levelCorrection, int sizeCanvas, Color foregroundColor, int margin)
+        private static void AddLevelAndMaskCodes(SKBitmap image, int numberMask, QRCodeErrorCorrection levelCorrection, int sizeCanvas, SKColor foregroundColor, int margin)
         {
             int code = QRCodesData.CodeMaskAndLevels[8 * ((int)levelCorrection) + numberMask];
             for (int i = 0; i < 15; i++)
@@ -141,27 +139,23 @@ namespace Gehtsoft.Barcodes.Rendering
             SetPixelToBitmap(image, 8, sizeCanvas - 8, margin, foregroundColor);
         }
 
-        private static void AddLevelDataToMask(Graphics graphMaskSystemAreaQRCode, int sizeCanvas, int margin)
+        private static void AddLevelDataToMask(SKCanvas canvasMask, int sizeCanvas, int margin)
         {
             var coord8 = GetPosition(8, margin);
             var coord0 = GetPosition(0, margin);
             var coordCanvasMinus1 = GetPosition(sizeCanvas - 1, margin);
             var coordCanvasMinus8 = GetPosition(sizeCanvas - 8, margin);
-            graphMaskSystemAreaQRCode.DrawLine(new Pen(Color.Black), 
-                                               coord8, coord0, 
-                                               coord8, coord8);
-            graphMaskSystemAreaQRCode.DrawLine(new Pen(Color.Black), 
-                                               coord0, coord8, 
-                                               coord8, coord8);
-            graphMaskSystemAreaQRCode.DrawLine(new Pen(Color.Black), 
-                                               coordCanvasMinus8, coord8, 
-                                               coordCanvasMinus1, coord8);
-            graphMaskSystemAreaQRCode.DrawLine(new Pen(Color.Black), 
-                                               coord8, coordCanvasMinus8, 
-                                               coord8, coordCanvasMinus1);
+
+            using (var paint = new SKPaint { Color = SKColors.Black, Style = SKPaintStyle.Stroke, StrokeWidth = 1 })
+            {
+                canvasMask.DrawLine(coord8, coord0, coord8, coord8, paint);
+                canvasMask.DrawLine(coord0, coord8, coord8, coord8, paint);
+                canvasMask.DrawLine(coordCanvasMinus8, coord8, coordCanvasMinus1, coord8, paint);
+                canvasMask.DrawLine(coord8, coordCanvasMinus8, coord8, coordCanvasMinus1, paint);
+            }
         }
 
-        private static void AddBinaryDataToImage(Bitmap image, Bitmap imageMask, byte[] dataBinary, int sizeCanvas, SolidBrush foregroundColor, int numberMask, int margin)
+        private static void AddBinaryDataToImage(SKBitmap image, SKBitmap imageMask, byte[] dataBinary, int sizeCanvas, SKColor foregroundColor, int numberMask, int margin)
         {
             int indexByte = 0;
             int indexBit = 7;
@@ -169,7 +163,6 @@ namespace Gehtsoft.Barcodes.Rendering
             int stripY = sizeCanvas - 1;
             bool isUp = true;
             int offsetX = 1;
-            Color color = foregroundColor.Color;
             bool hasPixel = false;
 
             while (indexByte < dataBinary.Length)
@@ -180,7 +173,7 @@ namespace Gehtsoft.Barcodes.Rendering
                 var y = GetPosition(posY, margin);
 
                 // If not a system area pixel, then write a bit of data
-                if (imageMask.GetPixel(x, y).A == 0)
+                if (imageMask.GetPixel(x, y).Alpha == 0)
                 {
                     if (((dataBinary[indexByte] >> indexBit) & 1) == 1)
                         hasPixel = true;
@@ -192,7 +185,7 @@ namespace Gehtsoft.Barcodes.Rendering
                         hasPixel = !hasPixel;
 
                     if (hasPixel)
-                        image.SetPixel(x, y, color);
+                        image.SetPixel(x, y, foregroundColor);
 
                     indexBit--;
                     if (indexBit < 0)
@@ -201,7 +194,7 @@ namespace Gehtsoft.Barcodes.Rendering
                         indexByte++;
                     }
                 }
-                CalcNextCurrentPosition(ref stripX, ref stripY, ref offsetX, ref isUp, 
+                CalcNextCurrentPosition(ref stripX, ref stripY, ref offsetX, ref isUp,
                                         sizeCanvas);
             }
         }
@@ -216,7 +209,7 @@ namespace Gehtsoft.Barcodes.Rendering
                 stripY += isUp ? -1 : 1;
                 if (stripY < 0)
                 {
- 
+
                     // then move from top to bottom
                     isUp = !isUp;
                     stripY = 0;
@@ -263,7 +256,7 @@ namespace Gehtsoft.Barcodes.Rendering
             throw new NotImplementedException();
         }
 
-        private static void AddVersionDataToImage(Bitmap image, Bitmap imageMasque, int version, int sizeCanvas, Color foregroundColor, int margin)
+        private static void AddVersionDataToImage(SKBitmap image, SKBitmap imageMask, int version, int sizeCanvas, SKColor foregroundColor, int margin)
         {
             if (version >= 7)
             {
@@ -288,12 +281,12 @@ namespace Gehtsoft.Barcodes.Rendering
                         SetPixelToBitmap(image, sizeCanvas - 9, 5 - i, margin, foregroundColor);
                         SetPixelToBitmap(image, 5 - i, sizeCanvas - 9, margin, foregroundColor);
                     }
-                    SetPixelToBitmap(imageMasque, sizeCanvas - 11, 5 - i, margin, Color.Black);
-                    SetPixelToBitmap(imageMasque, 5 - i, sizeCanvas - 11, margin, Color.Black);
-                    SetPixelToBitmap(imageMasque, sizeCanvas - 10, 5 - i, margin, Color.Black);
-                    SetPixelToBitmap(imageMasque, 5 - i, sizeCanvas - 10, margin, Color.Black);
-                    SetPixelToBitmap(imageMasque, sizeCanvas - 9, 5 - i, margin, Color.Black);
-                    SetPixelToBitmap(imageMasque, 5 - i, sizeCanvas - 9, margin, Color.Black);
+                    SetPixelToBitmap(imageMask, sizeCanvas - 11, 5 - i, margin, SKColors.Black);
+                    SetPixelToBitmap(imageMask, 5 - i, sizeCanvas - 11, margin, SKColors.Black);
+                    SetPixelToBitmap(imageMask, sizeCanvas - 10, 5 - i, margin, SKColors.Black);
+                    SetPixelToBitmap(imageMask, 5 - i, sizeCanvas - 10, margin, SKColors.Black);
+                    SetPixelToBitmap(imageMask, sizeCanvas - 9, 5 - i, margin, SKColors.Black);
+                    SetPixelToBitmap(imageMask, 5 - i, sizeCanvas - 9, margin, SKColors.Black);
                     line1 >>= 1;
                     line2 >>= 1;
                     line3 >>= 1;
@@ -301,37 +294,37 @@ namespace Gehtsoft.Barcodes.Rendering
             }
         }
 
-        private static void AddSyncToImage(Bitmap image, Bitmap imageMasque, int sizeCanvas, SolidBrush foregroundColor, int margin)
+        private static void AddSyncToImage(SKBitmap image, SKBitmap imageMask, int sizeCanvas, SKColor foregroundColor, int margin)
         {
             for (int t = 7; t <= sizeCanvas - 7; t+=1)
             {
                 if (t % 2 == 0)
                 {
-                    SetPixelToBitmap(image, t, 6, margin, foregroundColor.Color);
-                    SetPixelToBitmap(image, 6, t, margin, foregroundColor.Color);                    
+                    SetPixelToBitmap(image, t, 6, margin, foregroundColor);
+                    SetPixelToBitmap(image, 6, t, margin, foregroundColor);
                 }
-                SetPixelToBitmap(imageMasque, t, 6, margin, foregroundColor.Color);
-                SetPixelToBitmap(imageMasque, 6, t, margin, foregroundColor.Color);
+                SetPixelToBitmap(imageMask, t, 6, margin, foregroundColor);
+                SetPixelToBitmap(imageMask, 6, t, margin, foregroundColor);
             }
         }
 
-        private static void AddTemplateToGraphics(Graphics graph, Graphics graphMaskQRCode, int version, int sizeCanvas, Brush foregroundColor, Brush backgroundColor, int margin)
+        private static void AddTemplateToCanvas(SKCanvas canvas, SKCanvas canvasMask, int version, int sizeCanvas, SKPaint foregroundPaint, SKPaint backgroundPaint, int margin)
         {
-            AddFindingSquareToGraphics(graph, graphMaskQRCode, 
-                                       new Point(GetPosition(3, margin), 
-                                                 GetPosition(3, margin)), 
-                                       foregroundColor, 
-                                       backgroundColor);
-            AddFindingSquareToGraphics(graph, graphMaskQRCode, 
-                                       new Point(GetPosition(3, margin), 
-                                                 GetPosition(sizeCanvas - 4, margin)), 
-                                       foregroundColor, 
-                                       backgroundColor);
-            AddFindingSquareToGraphics(graph, graphMaskQRCode, 
-                                       new Point(GetPosition(sizeCanvas - 4, margin), 
-                                                 GetPosition(3, margin)), 
-                                       foregroundColor, 
-                                       backgroundColor);
+            AddFindingSquareToCanvas(canvas, canvasMask,
+                                       GetPosition(3, margin),
+                                       GetPosition(3, margin),
+                                       foregroundPaint,
+                                       backgroundPaint);
+            AddFindingSquareToCanvas(canvas, canvasMask,
+                                       GetPosition(3, margin),
+                                       GetPosition(sizeCanvas - 4, margin),
+                                       foregroundPaint,
+                                       backgroundPaint);
+            AddFindingSquareToCanvas(canvas, canvasMask,
+                                       GetPosition(sizeCanvas - 4, margin),
+                                       GetPosition(3, margin),
+                                       foregroundPaint,
+                                       backgroundPaint);
 
             foreach(int x in QRCodesData.CoordinatesOfAlignSquares[version - 1])
                 foreach(int y in QRCodesData.CoordinatesOfAlignSquares[version - 1])
@@ -339,45 +332,35 @@ namespace Gehtsoft.Barcodes.Rendering
                     if (!(x < 8 && y < 8 || x < 8 && y > sizeCanvas - 8 ||
                         x > sizeCanvas - 8 && y < 8))
                     {
-                        AddAlignSquareToGraphics(graph, graphMaskQRCode,
-                                                 new Point(GetPosition(x, margin),
-                                                           GetPosition(y, margin)),
-                                                 foregroundColor,
-                                                 backgroundColor);
+                        AddAlignSquareToCanvas(canvas, canvasMask,
+                                                 GetPosition(x, margin),
+                                                 GetPosition(y, margin),
+                                                 foregroundPaint,
+                                                 backgroundPaint);
                     }
                 }
         }
 
-        private static void AddFindingSquareToGraphics(System.Drawing.Graphics graph, System.Drawing.Graphics graphMask, Point position, Brush foregroundColor, Brush backgroundColor)
+        private static void AddFindingSquareToCanvas(SKCanvas canvas, SKCanvas canvasMask, float centerX, float centerY, SKPaint foregroundPaint, SKPaint backgroundPaint)
         {
-            graph.FillRectangle(foregroundColor, 
-                                new Rectangle(new Point(position.X - 3, position.Y - 3),
-                                              new Size(7, 7)));
-            graph.FillRectangle(backgroundColor, 
-                                new Rectangle(new Point(position.X - 2, position.Y - 2),
-                                              new Size(5, 5)));
-            graph.FillRectangle(foregroundColor, 
-                                new Rectangle(new Point(position.X - 1, position.Y - 1), 
-                                              new Size(3, 3)));
-            graphMask.FillRectangle(new SolidBrush(Color.Black), 
-                                    new Rectangle(new Point(position.X - 4, position.Y - 4), 
-                                                  new Size(9, 9)));
+            using (var maskPaint = new SKPaint { Color = SKColors.Black, Style = SKPaintStyle.Fill })
+            {
+                canvas.DrawRect(centerX - 3, centerY - 3, 7, 7, foregroundPaint);
+                canvas.DrawRect(centerX - 2, centerY - 2, 5, 5, backgroundPaint);
+                canvas.DrawRect(centerX - 1, centerY - 1, 3, 3, foregroundPaint);
+                canvasMask.DrawRect(centerX - 4, centerY - 4, 9, 9, maskPaint);
+            }
         }
 
-        private static void AddAlignSquareToGraphics(System.Drawing.Graphics graph, System.Drawing.Graphics graphMask, Point position, Brush foregroundColor, Brush backgroundColor)
+        private static void AddAlignSquareToCanvas(SKCanvas canvas, SKCanvas canvasMask, float centerX, float centerY, SKPaint foregroundPaint, SKPaint backgroundPaint)
         {
-            graph.FillRectangle(foregroundColor, 
-                                new Rectangle(new Point(position.X - 2, position.Y - 2),
-                                              new Size(5, 5)));
-            graph.FillRectangle(backgroundColor, 
-                                new Rectangle(new Point(position.X - 1, position.Y - 1),
-                                              new Size(3, 3)));
-            graph.FillRectangle(foregroundColor, 
-                                new Rectangle(new Point(position.X, position.Y),
-                                              new Size(1, 1)));
-            graphMask.FillRectangle(new SolidBrush(Color.Black), 
-                                    new Rectangle(new Point(position.X - 2, position.Y - 2), 
-                                                  new Size(5, 5)));
+            using (var maskPaint = new SKPaint { Color = SKColors.Black, Style = SKPaintStyle.Fill })
+            {
+                canvas.DrawRect(centerX - 2, centerY - 2, 5, 5, foregroundPaint);
+                canvas.DrawRect(centerX - 1, centerY - 1, 3, 3, backgroundPaint);
+                canvas.DrawRect(centerX, centerY, 1, 1, foregroundPaint);
+                canvasMask.DrawRect(centerX - 2, centerY - 2, 5, 5, maskPaint);
+            }
         }
 
         /// <summary>
@@ -385,7 +368,7 @@ namespace Gehtsoft.Barcodes.Rendering
         /// </summary>
         /// <param name="coord">The coordinate.</param>
         /// <param name="margin">The quiet zone.</param>
-        /// <returns>int</returns>   
+        /// <returns>int</returns>
         private static int GetPosition(int coord, int margin) => margin + coord;
 
         /// <summary>
@@ -397,7 +380,7 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="foregroundColor">The QR code color.</param>
         /// <param name="margin">The quiet zone.</param>
         /// <returns>int</returns>
-        private static void SetPixelToBitmap(Bitmap image, int x, int y, int margin, Color foregroundColor)
+        private static void SetPixelToBitmap(SKBitmap image, int x, int y, int margin, SKColor foregroundColor)
         {
             image.SetPixel(GetPosition(x, margin),
                            GetPosition(y, margin),

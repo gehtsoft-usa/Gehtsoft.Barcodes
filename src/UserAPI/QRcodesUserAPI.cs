@@ -1,5 +1,5 @@
 using System;
-using System.Drawing;
+using SkiaSharp;
 using Gehtsoft.Barcodes.Enums;
 using Gehtsoft.Barcodes.Rendering;
 using Gehtsoft.Barcodes.Utils;
@@ -23,7 +23,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <returns>byte[]</returns>
         public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, QRCodeVersion version, int scaleMultiplier = 1)
         {
-            return GetQRCode(data, encoding, levelCorrection, version, scaleMultiplier, Color.Black, Color.White);
+            return GetQRCode(data, encoding, levelCorrection, version, scaleMultiplier, SKColors.Black, SKColors.White);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="backgroundColor">The background color.</param>
         /// <param name="hasQuietZones">Defines whether the QR code has a "quiet zone".</param>
         /// <returns>byte[]</returns>
-        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, QRCodeVersion version, int scaleMultiplier, Color foregroundColor, Color backgroundColor, bool hasQuietZones = true)
+        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, QRCodeVersion version, int scaleMultiplier, SKColor foregroundColor, SKColor backgroundColor, bool hasQuietZones = true)
         {
             // Validation
             if (string.IsNullOrEmpty(data))
@@ -66,7 +66,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="backgroundColor">The background color.</param>
         /// <param name="hasQuietZones">Defines whether the QR code has a "quiet zone".</param>
         /// <returns>byte[]</returns>
-        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, int scaleMultiplier, Color foregroundColor, Color backgroundColor, bool hasQuietZones = true)
+        public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, int scaleMultiplier, SKColor foregroundColor, SKColor backgroundColor, bool hasQuietZones = true)
         {
             return GetQRCode(data, encoding, levelCorrection,
                 QRCodesUtils.GetMinVersionForBinaryMode(data, levelCorrection),
@@ -85,7 +85,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <returns>byte[]</returns>
         public static byte[] GetQRCode(string data, QRCodeEncodingMethod encoding, QRCodeErrorCorrection levelCorrection, int scaleMultiplier = 1)
         {
-            return GetQRCode(data, encoding, levelCorrection, scaleMultiplier, Color.Black, Color.White);
+            return GetQRCode(data, encoding, levelCorrection, scaleMultiplier, SKColors.Black, SKColors.White);
         }
     }
 }
