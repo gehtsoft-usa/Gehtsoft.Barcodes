@@ -261,7 +261,11 @@ namespace Gehtsoft.Barcodes.Rendering
                             oneDigitShift = 7;
                         }
 
-                        float textPosY = barcodeHeight - 1;
+                        // GDI+ positioned text from top of box, SkiaSharp uses baseline
+                        // Match old behavior: textPosY was (barcodeHeight - 1 - labelFont.Size)
+                        // which was the TOP of the text. For baseline positioning, add descent.
+                        var fontMetrics = textPaint.FontMetrics;
+                        float textPosY = barcodeHeight - 1 - fontMetrics.Descent;
 
                         // Draw left text
                         float textLeftX = (leftQuiteZoneCount + leftSeparatorCount + oneDigitShift + 3) * scaleMultiplier;
@@ -280,6 +284,7 @@ namespace Gehtsoft.Barcodes.Rendering
                         // Print the first and the last digits for UPC-A:
                         if ((barcodeType == BarcodeType.UPC_A) && hasQuietZones)
                         {
+                            var fontMetricsSmall = textPaintSmall.FontMetrics;
                             float smallTextPosY = textPosY - (labelFontSize - labelFontSmallSize);
                             canvas.DrawText(textDataString.Substring(0, 1), 2 * scaleMultiplier, smallTextPosY, textPaintSmall);
 
@@ -393,8 +398,6 @@ namespace Gehtsoft.Barcodes.Rendering
                 // 4. Print data string under the barcode
                 if (showDataLabel)
                 {
-                    labelY = internalHeight + 1;
-
                     using (var textPaint = new SKPaint
                     {
                         Color = strokeColor ?? SKColors.Black,
@@ -404,8 +407,12 @@ namespace Gehtsoft.Barcodes.Rendering
                         Typeface = SKTypeface.FromFamilyName(GS1_128Data.font_family_name)
                     })
                     {
+                        // Use font metrics to match GDI+ baseline positioning
+                        var fontMetrics = textPaint.FontMetrics;
+                        float textBaseline = labelY - fontMetrics.Ascent;
+
                         float centerX = internalWidth / 2f;
-                        canvas.DrawText(textDataString, centerX, labelY + labelFontSize, textPaint);
+                        canvas.DrawText(textDataString, centerX, textBaseline, textPaint);
                     }
                 }
             }
