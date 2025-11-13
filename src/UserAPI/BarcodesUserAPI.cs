@@ -1,4 +1,5 @@
 ﻿using Gehtsoft.Barcodes.Encoding;
+using SkiaSharp;
 using Gehtsoft.Barcodes.Enums;
 using Gehtsoft.Barcodes.Rendering;
 using Gehtsoft.Barcodes.Utils;
@@ -20,7 +21,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
         /// <param name="barcodeRotation">The barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>     
-        public static byte[] GetBarcode(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
+        public static byte[] GetBarcode(string data, BarcodeType barcodeType, SKColor lineColor, SKColor backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Validate the data depending on barcodeType:
             BarcodesUtils.ValidateBarcodeData(data, barcodeType);
@@ -53,7 +54,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
         /// <param name="barcodeRotation">The barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>
-        internal static byte[] GetBarcodeEAN_UPC(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
+        internal static byte[] GetBarcodeEAN_UPC(string data, BarcodeType barcodeType, SKColor lineColor, SKColor backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Process the data and encode it:
             byte[] encodedData = BarcodesEncoder.EncodeBarcodeDataEAN_UPC(data, barcodeType);
@@ -77,7 +78,7 @@ namespace Gehtsoft.Barcodes.UserAPI
         /// <param name="barcodeRotation">The barcode rotation angle.</param>
         /// <returns>Array of bytes</returns>
 
-        internal static byte[] GetBarcodeGS1_128(string data, BarcodeType barcodeType, System.Drawing.Color lineColor, System.Drawing.Color backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
+        internal static byte[] GetBarcodeGS1_128(string data, BarcodeType barcodeType, SKColor lineColor, SKColor backColor, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Process the data and encode it:
             byte[] encodedData = BarcodesEncoder.EncodeBarcodeDataGS1_128(data, barcodeType);

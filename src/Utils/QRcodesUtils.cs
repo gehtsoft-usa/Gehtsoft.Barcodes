@@ -3,8 +3,7 @@ using Gehtsoft.Barcodes.Enums;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+using SkiaSharp;
 using System.Text;
 // ReSharper disable InconsistentNaming
 
@@ -22,21 +21,20 @@ namespace Gehtsoft.Barcodes.Utils
         /// </summary>
         /// <param name="image">The bitmap image of the barcode.</param>
         /// <param name="scaleMultiplier">The pixel scaling factor.</param>
-        /// <returns>Bitmap</returns>        
-        internal static Bitmap Scale(Bitmap image, int scaleMultiplier)
+        /// <returns>SKBitmap</returns>
+        internal static SKBitmap Scale(SKBitmap image, int scaleMultiplier)
         {
-
             int size = image.Width * scaleMultiplier;
-            var imageScaled = new Bitmap(size, size);
-            using (Graphics graph = Graphics.FromImage(imageScaled))
-            {
-                graph.InterpolationMode = InterpolationMode.NearestNeighbor;
-                graph.SmoothingMode = SmoothingMode.None;
-                graph.PixelOffsetMode = PixelOffsetMode.Half;
-                graph.PageUnit = GraphicsUnit.Pixel;
+            var imageScaled = new SKBitmap(size, size, SKColorType.Rgba8888, SKAlphaType.Premul);
 
-                graph.ScaleTransform(scaleMultiplier, scaleMultiplier);
-                graph.DrawImage(image, 0, 0);
+            using (var canvas = new SKCanvas(imageScaled))
+            using (var paint = new SKPaint())
+            {
+                paint.FilterQuality = SKFilterQuality.None; // Nearest neighbor
+                paint.IsAntialias = false;
+
+                canvas.Scale(scaleMultiplier, scaleMultiplier);
+                canvas.DrawBitmap(image, 0, 0, paint);
             }
             return imageScaled;
         }

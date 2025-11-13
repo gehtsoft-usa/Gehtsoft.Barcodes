@@ -1,10 +1,8 @@
-﻿using Gehtsoft.Barcodes.Data;
+using Gehtsoft.Barcodes.Data;
 using Gehtsoft.Barcodes.Enums;
-using System.Drawing;
+using SkiaSharp;
 using System.IO;
-using System.Drawing.Drawing2D;
 using Gehtsoft.Barcodes.Utils;
-using System.Drawing.Imaging;
 using System;
 
 namespace Gehtsoft.Barcodes.Rendering
@@ -28,15 +26,19 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="scaleMultiplier">The multiplier of the barcode width for better text rendering.</param>
         /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Byte array</returns>
-        internal static byte[] GetBarcodeImageEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
+        internal static byte[] GetBarcodeImageEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, bool showDataLabel, MeasureBarcodeUnit heightToCut, int scaleMultiplier = 2, SKColor? strokeColor = null, SKColor? backColor = null, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Draw barcode on bitmap:
-            Bitmap bitmap = DrawBitmapEAN_UPC(encodedData, textDataString, barcodeType, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones, barcodeRotation);
-            // Save bitmap to a byte array:
-            using (var memStream = new MemoryStream())
+            using (var bitmap = DrawBitmapEAN_UPC(encodedData, textDataString, barcodeType, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones, barcodeRotation))
             {
-                bitmap.Save(memStream, ImageFormat.Png);
-                return memStream.ToArray();
+                // Save bitmap to a byte array:
+                using (var memStream = new MemoryStream())
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var encoded = image.Encode(SKEncodedImageFormat.Png, 100))
+                {
+                    encoded.SaveTo(memStream);
+                    return memStream.ToArray();
+                }
             }
         }
 
@@ -55,15 +57,19 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <returns></returns>
         internal static byte[] GetBarcodeImageGS1_128(byte[] encodedData, string textDataString,
             MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 2,
-            Color? strokeColor = null, Color? backColor = null, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
+            SKColor? strokeColor = null, SKColor? backColor = null, bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Draw barcode on bitmap:
-            Bitmap bitmap = DrawBitmapGS1_128(encodedData, textDataString, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones, barcodeRotation);
-            // Save bitmap to a byte array:
-            using (var memStream = new MemoryStream())
+            using (var bitmap = DrawBitmapGS1_128(encodedData, textDataString, heightToCut, showDataLabel, scaleMultiplier, strokeColor, backColor, hasQuietZones, barcodeRotation))
             {
-                bitmap.Save(memStream, ImageFormat.Png);
-                return memStream.ToArray();
+                // Save bitmap to a byte array:
+                using (var memStream = new MemoryStream())
+                using (var image = SKImage.FromBitmap(bitmap))
+                using (var encoded = image.Encode(SKEncodedImageFormat.Png, 100))
+                {
+                    encoded.SaveTo(memStream);
+                    return memStream.ToArray();
+                }
             }
         }
 
@@ -81,8 +87,8 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="hasQuietZones">Defines whether the barcode has quiet zones.</param>
         /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Bitmap</returns>
-        internal static Bitmap DrawBitmapEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType, 
-            MeasureBarcodeUnit heightToCut, bool showDataLabel, int scaleMultiplier = 2, Color? strokeColor = null, Color? backColor = null, 
+        internal static SKBitmap DrawBitmapEAN_UPC(byte[] encodedData, string textDataString, BarcodeType barcodeType,
+            MeasureBarcodeUnit heightToCut, bool showDataLabel, int scaleMultiplier = 2, SKColor? strokeColor = null, SKColor? backColor = null,
             bool hasQuietZones = true, BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
         {
             // Bitmap accepts only integer values:
@@ -93,8 +99,8 @@ namespace Gehtsoft.Barcodes.Rendering
             int leftQuiteZoneCount;
             int leftCodePartCount;
             int shiftFromTop = EANData.shift_from_top * scaleMultiplier;
-            Font labelFont = new Font(EANData.font_family_name, EANData.default_font_size * scaleMultiplier);
-            Font labelFontSmall = new Font(EANData.font_family_name, EANData.default_font_small_size * scaleMultiplier);
+            float labelFontSize = EANData.default_font_size * scaleMultiplier;
+            float labelFontSmallSize = EANData.default_font_small_size * scaleMultiplier;
             string textDataLeft;
             string textDataRight;
             int dotsPerInch = EANData.dots_per_inch;
@@ -152,30 +158,30 @@ namespace Gehtsoft.Barcodes.Rendering
             separatorHeight = Math.Max(separatorHeight - cut, 0);
             barcodeHeight = barcodeHeight - cut;
 
-            Bitmap bitmap;
+            var bitmap = new SKBitmap(barcodeWidth, barcodeHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
 
-            bitmap = new Bitmap(barcodeWidth, barcodeHeight);
-
-            bitmap.SetResolution(dotsPerInch, dotsPerInch);
-
-            using (var graphics = Graphics.FromImage(bitmap))
+            using (var canvas = new SKCanvas(bitmap))
+            using (var strokePaint = new SKPaint { Color = strokeColor ?? SKColors.Black, Style = SKPaintStyle.Stroke, StrokeWidth = scaleMultiplier, IsAntialias = false })
+            using (var spacePaint = new SKPaint { Color = backColor ?? SKColors.White, Style = SKPaintStyle.Stroke, StrokeWidth = scaleMultiplier, IsAntialias = false })
             {
                 void DrawStrokeLine(int pos, bool isSeparator = false)
-                { 
-                    graphics.DrawLine(new Pen(strokeColor ?? Color.Black, scaleMultiplier),
-                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop),
-                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight)));
+                {
+                    canvas.DrawLine(
+                        pos * scaleMultiplier + halfBarItemWidth, shiftFromTop,
+                        pos * scaleMultiplier + halfBarItemWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight),
+                        strokePaint);
                 }
 
                 void DrawSpaceLine(int pos, bool isSeparator = false)
                 {
-                    graphics.DrawLine(new Pen(backColor ?? Color.White, scaleMultiplier),
-                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop),
-                        new PointF(pos * scaleMultiplier + halfBarItemWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight)));
+                    canvas.DrawLine(
+                        pos * scaleMultiplier + halfBarItemWidth, shiftFromTop,
+                        pos * scaleMultiplier + halfBarItemWidth, shiftFromTop + (isSeparator ? separatorHeight : strokeHeight),
+                        spacePaint);
                 }
 
                 // Paint the background:
-                graphics.Clear(backColor ?? Color.White);
+                canvas.Clear(backColor ?? SKColors.White);
 
                 int x = 0;
 
@@ -234,86 +240,69 @@ namespace Gehtsoft.Barcodes.Rendering
 
                 if (showDataLabel)
                 {
-                    var digitsPath = new GraphicsPath();
-                    var digitsBrush = new SolidBrush(strokeColor ?? Color.Black);
-
-                    int oneDigitShift = 0;
-                    if (barcodeType == BarcodeType.UPC_A)
+                    using (var textPaint = new SKPaint
                     {
-                        oneDigitShift = 7;
-                    }
-
-                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-                    float textPosY = barcodeHeight - 1 - labelFont.Size;
-
-                    digitsPath.AddString(textDataLeft, labelFont.FontFamily, (int)labelFont.Style, labelFont.Size,
-                        new RectangleF(
-                            (leftQuiteZoneCount + leftSeparatorCount + oneDigitShift + 3) * scaleMultiplier,
-                            textPosY,
-                            (leftCodePartCount + 7) * scaleMultiplier,
-                            labelFont.Height
-                            ),
-                        StringFormat.GenericTypographic);
-                    digitsPath.AddString(textDataRight, labelFont.FontFamily, (int)labelFont.Style, labelFont.Size,
-                        new RectangleF(
-                            (leftQuiteZoneCount + leftSeparatorCount + 2 + leftCodePartCount + middleSeparatorCount) * scaleMultiplier,
-                            textPosY,
-                            (leftCodePartCount + 7) * scaleMultiplier,
-                            labelFont.Height
-                            ),
-                        StringFormat.GenericTypographic);
-
-                    // Print the first digit for EAN-13:
-                    if ((barcodeType == BarcodeType.EAN_13) && hasQuietZones)
+                        Color = strokeColor ?? SKColors.Black,
+                        TextSize = labelFontSize,
+                        IsAntialias = true,
+                        Typeface = SKTypeface.FromFamilyName(EANData.font_family_name)
+                    })
+                    using (var textPaintSmall = new SKPaint
                     {
-                        digitsPath.AddString(textDataString.Substring(0, 1), labelFont.FontFamily, (int)labelFont.Style, labelFont.Size,
-                        new RectangleF(
-                            1 * scaleMultiplier,
-                            textPosY,
-                            (leftCodePartCount + 7) * scaleMultiplier,
-                            labelFont.Height
-                            ),
-                        StringFormat.GenericTypographic);
-                    }
-
-                    // Print the first and the last digits for UPC-A:
-                    if ((barcodeType == BarcodeType.UPC_A) && hasQuietZones)
+                        Color = strokeColor ?? SKColors.Black,
+                        TextSize = labelFontSmallSize,
+                        IsAntialias = true,
+                        Typeface = SKTypeface.FromFamilyName(EANData.font_family_name)
+                    })
                     {
-                        digitsPath.AddString(textDataString.Substring(0, 1), labelFontSmall.FontFamily, (int)labelFontSmall.Style, labelFontSmall.Size,
-                        new RectangleF(
-                            2 * scaleMultiplier,
-                            (textPosY + labelFont.Size - labelFontSmall.Size),
-                            (7) * scaleMultiplier,
-                            labelFontSmall.Height
-                            ),
-                        StringFormat.GenericTypographic);
+                        int oneDigitShift = 0;
+                        if (barcodeType == BarcodeType.UPC_A)
+                        {
+                            oneDigitShift = 7;
+                        }
 
-                        digitsPath.AddString(textDataRight, labelFontSmall.FontFamily, (int)labelFontSmall.Style, labelFontSmall.Size,
-                        new RectangleF(
-                            (leftQuiteZoneCount + leftSeparatorCount * 2 + 2 + leftCodePartCount * 2 + middleSeparatorCount) * scaleMultiplier,
-                            (textPosY + labelFont.Size - labelFontSmall.Size),
-                            (7) * scaleMultiplier,
-                            labelFontSmall.Height
-                            ),
-                        StringFormat.GenericTypographic);
+                        // GDI+ positioned text from top of box, SkiaSharp uses baseline
+                        // Match old behavior: textPosY was (barcodeHeight - 1 - labelFont.Size)
+                        // which was the TOP of the text. For baseline positioning, add descent.
+                        var fontMetrics = textPaint.FontMetrics;
+                        float textPosY = barcodeHeight - 1 - fontMetrics.Descent;
+
+                        // Draw left text
+                        float textLeftX = (leftQuiteZoneCount + leftSeparatorCount + oneDigitShift + 3) * scaleMultiplier;
+                        canvas.DrawText(textDataLeft, textLeftX, textPosY, textPaint);
+
+                        // Draw right text
+                        float textRightX = (leftQuiteZoneCount + leftSeparatorCount + 2 + leftCodePartCount + middleSeparatorCount) * scaleMultiplier;
+                        canvas.DrawText(textDataRight, textRightX, textPosY, textPaint);
+
+                        // Print the first digit for EAN-13:
+                        if ((barcodeType == BarcodeType.EAN_13) && hasQuietZones)
+                        {
+                            canvas.DrawText(textDataString.Substring(0, 1), 1 * scaleMultiplier, textPosY, textPaint);
+                        }
+
+                        // Print the first and the last digits for UPC-A:
+                        if ((barcodeType == BarcodeType.UPC_A) && hasQuietZones)
+                        {
+                            var fontMetricsSmall = textPaintSmall.FontMetrics;
+                            float smallTextPosY = textPosY - (labelFontSize - labelFontSmallSize);
+                            canvas.DrawText(textDataString.Substring(0, 1), 2 * scaleMultiplier, smallTextPosY, textPaintSmall);
+
+                            float lastDigitX = (leftQuiteZoneCount + leftSeparatorCount * 2 + 2 + leftCodePartCount * 2 + middleSeparatorCount) * scaleMultiplier;
+                            canvas.DrawText(textDataString.Substring(11, 1), lastDigitX, smallTextPosY, textPaintSmall);
+                        }
                     }
-
-                    graphics.FillPath(digitsBrush, digitsPath);
                 }
             }
 
            switch(barcodeRotation)
             {
                 case BarcodeRotation.Clockwise_90:
-                    bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                    break;
+                    return RotateBitmap(bitmap, 90);
                 case BarcodeRotation.Clockwise_180:
-                    bitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                    break;
+                    return RotateBitmap(bitmap, 180);
                 case BarcodeRotation.Clockwise_270:
-                    bitmap.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                    break;
+                    return RotateBitmap(bitmap, 270);
             }
 
             return bitmap;
@@ -332,11 +321,11 @@ namespace Gehtsoft.Barcodes.Rendering
         /// <param name="strokeColor">The color of barcode lines.</param>
         /// <param name="barcodeRotation">Defines barcode rotation angle.</param>
         /// <returns>Bitmap</returns>
-        internal static Bitmap DrawBitmapGS1_128(byte[] encodedData, string textDataString,
+        internal static SKBitmap DrawBitmapGS1_128(byte[] encodedData, string textDataString,
             MeasureBarcodeUnit heightToCut, bool showDataLabel = true, int scaleMultiplier = 2,
-            Color? strokeColor = null, Color ? backColor = null, bool hasQuietZones = true, 
+            SKColor? strokeColor = null, SKColor ? backColor = null, bool hasQuietZones = true,
             BarcodeRotation barcodeRotation = BarcodeRotation.Clockwise_0)
-        {            
+        {
             int halfBarItemWidth = scaleMultiplier / 2;
 
             int quietZoneWidth = GS1_128Data.QuietZoneMinimumWidth * scaleMultiplier;
@@ -347,7 +336,7 @@ namespace Gehtsoft.Barcodes.Rendering
             }
 
             int internalWidth = quietZoneWidth * 2 + encodedData.Length * scaleMultiplier;
-            
+
             // Barcode height is 15% of the width:
             int internalHeight = (int)(internalWidth * 0.15f);
 
@@ -356,7 +345,7 @@ namespace Gehtsoft.Barcodes.Rendering
 
             internalHeight = internalHeight - (int)(internalHeight * percentToCut / 100);
 
-            Font labelFont = new Font(GS1_128Data.font_family_name, GS1_128Data.default_font_size * scaleMultiplier);
+            float labelFontSize = GS1_128Data.default_font_size * scaleMultiplier;
 
             float labelY = 0f, labelHeight = 0f;
             float labelWidth = 0f;
@@ -364,80 +353,108 @@ namespace Gehtsoft.Barcodes.Rendering
             {
                 labelHeight = scaleMultiplier * 2;
                 labelY = labelHeight + internalHeight;
-                labelHeight += labelFont.Size;
-                using (var temp = new Bitmap(1, 1))
-                    using (var g = Graphics.FromImage(temp))
-                        labelWidth = g.MeasureString(textDataString, labelFont).Width;
+                labelHeight += labelFontSize;
+
+                using (var tempPaint = new SKPaint
+                {
+                    TextSize = labelFontSize,
+                    Typeface = SKTypeface.FromFamilyName(GS1_128Data.font_family_name)
+                })
+                {
+                    labelWidth = tempPaint.MeasureText(textDataString);
+                }
             }
 
-            var bitmap = new Bitmap(internalWidth, internalHeight + (int) labelHeight);
+            var bitmap = new SKBitmap(internalWidth, internalHeight + (int) labelHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
 
             int dotsPerInch = GS1_128Data.dots_per_inch;
-            bitmap.SetResolution(dotsPerInch, dotsPerInch);
 
             int pos = 0;
-            using (var graphics = Graphics.FromImage(bitmap))
+            using (var canvas = new SKCanvas(bitmap))
+            using (var backgroundPaint = new SKPaint { Color = backColor ?? SKColors.White, Style = SKPaintStyle.Fill })
+            using (var strokePaint = new SKPaint { Color = strokeColor ?? SKColors.Black, Style = SKPaintStyle.Stroke, StrokeWidth = scaleMultiplier, IsAntialias = false })
+            using (var backgroundStrokePaint = new SKPaint { Color = backColor ?? SKColors.White, Style = SKPaintStyle.Stroke, StrokeWidth = scaleMultiplier, IsAntialias = false })
             {
-                graphics.Clear(backColor ?? Color.White);
-
-                Pen backgroundPen = new Pen(backColor ?? Color.White, scaleMultiplier);
-                Pen strokePen = new Pen(strokeColor ?? Color.Black, scaleMultiplier);
-                Brush backgroundBrush = new SolidBrush(backColor ?? Color.White);
+                canvas.Clear(backColor ?? SKColors.White);
 
                 // 1. Left quiet zone
-                graphics.FillRectangle(backgroundBrush,
-                    x: 0, y: 0,
-                    width: quietZoneWidth, height: internalHeight);
+                canvas.DrawRect(0, 0, quietZoneWidth, internalHeight, backgroundPaint);
                 pos += quietZoneWidth; // quiet zone is 10 * X here
 
                 // 2. Stop character
                 for (int i = 0; i < encodedData.Length; i++)
                 {
-                    graphics.DrawLine(encodedData[i] == 1 ? strokePen : backgroundPen,
-                        new Point(pos + halfBarItemWidth, 0),
-                        new Point(pos + halfBarItemWidth, internalHeight));
+                    canvas.DrawLine(
+                        pos + halfBarItemWidth, 0,
+                        pos + halfBarItemWidth, internalHeight,
+                        encodedData[i] == 1 ? strokePaint : backgroundStrokePaint);
 
                     pos += scaleMultiplier;
                 }
 
                 // 3. Right quiet zone
-                graphics.FillRectangle(backgroundBrush,
-                    x: pos + halfBarItemWidth, y: 0,
-                    width: quietZoneWidth, height: internalHeight);
+                canvas.DrawRect(pos + halfBarItemWidth, 0, quietZoneWidth, internalHeight, backgroundPaint);
 
                 // 4. Print data string under the barcode
                 if (showDataLabel)
                 {
-                    labelY = internalHeight + 1;
+                    using (var textPaint = new SKPaint
+                    {
+                        Color = strokeColor ?? SKColors.Black,
+                        TextSize = labelFontSize,
+                        IsAntialias = true,
+                        TextAlign = SKTextAlign.Center,
+                        Typeface = SKTypeface.FromFamilyName(GS1_128Data.font_family_name)
+                    })
+                    {
+                        // Use font metrics to match GDI+ baseline positioning
+                        var fontMetrics = textPaint.FontMetrics;
+                        float textBaseline = labelY - fontMetrics.Ascent;
 
-                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-                    var labelPath = new GraphicsPath();
-                    var labelBrush = new SolidBrush(strokeColor ?? Color.Black);
-
-                    labelPath.AddString(textDataString, labelFont.FontFamily, (int)labelFont.Style, labelFont.Size,
-                        new RectangleF(x: internalWidth/2f - labelWidth / 2, y: labelY, labelWidth, labelHeight),
-                        new StringFormat(StringFormat.GenericTypographic) { Alignment = StringAlignment.Center });
-
-                    graphics.FillPath(labelBrush, labelPath);
+                        float centerX = internalWidth / 2f;
+                        canvas.DrawText(textDataString, centerX, textBaseline, textPaint);
+                    }
                 }
             }
 
             switch (barcodeRotation)
             {
                 case BarcodeRotation.Clockwise_90:
-                    bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
-                    break;
+                    return RotateBitmap(bitmap, 90);
                 case BarcodeRotation.Clockwise_180:
-                    bitmap.RotateFlip(RotateFlipType.Rotate180FlipNone);
-                    break;
+                    return RotateBitmap(bitmap, 180);
                 case BarcodeRotation.Clockwise_270:
-                    bitmap.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                    break;
+                    return RotateBitmap(bitmap, 270);
             }
 
             return bitmap;
         }
 
+        /// <summary>
+        /// Rotates a bitmap by the specified angle.
+        /// </summary>
+        private static SKBitmap RotateBitmap(SKBitmap source, float degrees)
+        {
+            // For 90 and 270 degree rotations, swap width and height
+            int newWidth = (degrees == 90 || degrees == 270) ? source.Height : source.Width;
+            int newHeight = (degrees == 90 || degrees == 270) ? source.Width : source.Height;
+
+            var rotated = new SKBitmap(newWidth, newHeight, source.ColorType, source.AlphaType);
+
+            using (var canvas = new SKCanvas(rotated))
+            {
+                canvas.Clear(SKColors.Transparent);
+
+                // Move to center, rotate, move back
+                canvas.Translate(newWidth / 2f, newHeight / 2f);
+                canvas.RotateDegrees(degrees);
+                canvas.Translate(-source.Width / 2f, -source.Height / 2f);
+
+                canvas.DrawBitmap(source, 0, 0);
+            }
+
+            source.Dispose();
+            return rotated;
+        }
     }
 }
