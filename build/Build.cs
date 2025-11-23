@@ -48,8 +48,7 @@ partial class Build : NukeBuild
         {
             DotNetBuild(_ => _
                 .SetProjectFile(ProjectFile)
-                .SetConfiguration(Configuration)
-                .EnableNoRestore());
+                .SetConfiguration(Configuration));
         });
     
     IEnumerable<Project> TestProjects => Solution.GetAllProjects("*Tests");
