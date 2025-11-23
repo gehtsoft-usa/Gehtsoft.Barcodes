@@ -33,7 +33,7 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json') }}
       - name: 'Run: Compile'
         run: ./build.cmd Compile
   windows-latest:
@@ -47,7 +47,7 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json') }}
       - name: 'Run: Compile'
         run: ./build.cmd Compile
   macos-latest:
@@ -61,6 +61,6 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json') }}
       - name: 'Run: Compile'
         run: ./build.cmd Compile
