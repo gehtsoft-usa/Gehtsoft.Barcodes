@@ -33,13 +33,13 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json') }}
       - name: 'Run: Test'
         run: ./build.cmd Test
       - name: 'Publish: test-results'
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-ubuntu
           path: output/test-results
   windows-latest:
     name: windows-latest
@@ -52,13 +52,13 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json') }}
       - name: 'Run: Test'
         run: ./build.cmd Test
       - name: 'Publish: test-results'
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-windows
           path: output/test-results
   macos-latest:
     name: macos-latest
@@ -71,11 +71,11 @@ jobs:
           path: |
             .nuke/temp
             ~/.nuget/packages
-          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json') }}
       - name: 'Run: Test'
         run: ./build.cmd Test
       - name: 'Publish: test-results'
         uses: actions/upload-artifact@v4
         with:
-          name: test-results
+          name: test-results-macos
           path: output/test-results
