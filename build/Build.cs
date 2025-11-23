@@ -14,13 +14,15 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.MacOsLatest,
     InvokedTargets = new[] {nameof(Compile)},
-    OnPushBranches = new[] {"main"})]
+    OnPushBranches = new[] {"main"},
+    AutoGenerate = false)]
 [GitHubActions("test",
     GitHubActionsImage.UbuntuLatest,
     GitHubActionsImage.WindowsLatest,
     GitHubActionsImage.MacOsLatest,
     InvokedTargets = new[] {nameof(Test)},
-    OnPushBranches = new[] {"main"})]
+    OnPushBranches = new[] {"main"},
+    AutoGenerate = false)]
 partial class Build : NukeBuild
 {
     /// Support plugins are available for:
