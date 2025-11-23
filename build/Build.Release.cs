@@ -5,7 +5,6 @@ using Nuke.Common.IO;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.NuGet;
 using Nuke.Common.Utilities.Collections;
-using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.NuGet.NuGetTasks;
 
 partial class Build
@@ -55,9 +54,9 @@ partial class Build
         .After(Sign)
         .Executes(() =>
         {
-            if (!DirectoryExists(LocalNuGetFeedPath))
+            if (!LocalNuGetFeedPath.DirectoryExists())
             {
-                Directory.CreateDirectory(LocalNuGetFeedPath);
+                LocalNuGetFeedPath.CreateDirectory();
                 NuGetSourcesAdd(_ => _
                     .SetName("Local Barcodes NuGet Feed")
                     .SetSource(LocalNuGetFeedPath));
@@ -79,7 +78,7 @@ partial class Build
 
     Target RemoveNupkgFromLocalNuGet => _ => _
         .Requires(() => Version)
-        .Requires(() => DirectoryExists(LocalNuGetFeedPath))
+        .Requires(() => LocalNuGetFeedPath.DirectoryExists())
         .Executes(() =>
         {
             NuGetTasks.NuGet($"delete {PackageName} {Version} -NonInteractive -Source \"Local Barcodes NuGet Feed\"");

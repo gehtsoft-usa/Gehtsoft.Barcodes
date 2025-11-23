@@ -7,12 +7,8 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.MSBuild;
-using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-[CheckBuildProjectConfigurations]
-[ShutdownDotNetAfterServerBuild]
 [GitHubActions("build",
     GitHubActionsImage.UbuntuLatest,
     GitHubActionsImage.WindowsLatest,
@@ -48,31 +44,28 @@ partial class Build : NukeBuild
     Target Compile => _ => _
         .Executes(() =>
         {
-            MSBuildTasks.MSBuild(_ => _
-                .SetTargets("Clean", "Rebuild")
-                .EnableNoLogo()
-                .SetWarningLevel(0)
-                .EnableRestore()
+            DotNetBuild(_ => _
                 .SetProjectFile(ProjectFile)
-                .SetConfiguration(Configuration));
+                .SetConfiguration(Configuration)
+                .EnableNoRestore());
         });
     
-    IEnumerable<Project> TestProjects => Solution.GetProjects("*Tests");
+    IEnumerable<Project> TestProjects => Solution.GetAllProjects("*Tests");
     AbsolutePath TestResultDirectory => OutputDirectory / "test-results";
     Target Test => _ => _
         .DependsOn(Compile)
         .Produces(TestResultDirectory / "*.trx")
         .Executes(() =>
         {
-            EnsureCleanDirectory(TestResultDirectory);
+            TestResultDirectory.CreateOrCleanDirectory();
             DotNetTest(_ => _
                     .SetConfiguration(Configuration)
-                    .SetVerbosity(DotNetVerbosity.Normal)
+                    .SetVerbosity(DotNetVerbosity.normal)
                     .SetNoBuild(InvokedTargets.Contains(Compile))
                     .SetResultsDirectory(TestResultDirectory)
                     .CombineWith(TestProjects, (_, v) => _
                         .SetProjectFile(v)
-                        .SetLogger($"trx;LogFileName={v.Name}.trx")),
+                        .SetLoggers($"trx;LogFileName={v.Name}.trx")),
                 completeOnFailure: false);
         });
 }

@@ -26,10 +26,18 @@ jobs:
     name: ubuntu-latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Run './build.cmd Test'
+      - uses: actions/checkout@v4
+      - name: 'Cache: .nuke/temp, ~/.nuget/packages'
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
+      - name: 'Run: Test'
         run: ./build.cmd Test
-      - uses: actions/upload-artifact@v1
+      - name: 'Publish: test-results'
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: output/test-results
@@ -37,23 +45,37 @@ jobs:
     name: windows-latest
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Run './build.cmd Test'
+      - uses: actions/checkout@v4
+      - name: 'Cache: .nuke/temp, ~/.nuget/packages'
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
+      - name: 'Run: Test'
         run: ./build.cmd Test
-      - uses: actions/upload-artifact@v1
+      - name: 'Publish: test-results'
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: output/test-results
-  macOS-latest:
-    name: macOS-latest
-    runs-on: macOS-latest
+  macos-latest:
+    name: macos-latest
+    runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v1
-      - name: Install libgdiplus for System.Drawing support
-        run: brew install mono-libgdiplus
-      - name: Run './build.cmd Test'
+      - uses: actions/checkout@v4
+      - name: 'Cache: .nuke/temp, ~/.nuget/packages'
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nuke/temp
+            ~/.nuget/packages
+          key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
+      - name: 'Run: Test'
         run: ./build.cmd Test
-      - uses: actions/upload-artifact@v1
+      - name: 'Publish: test-results'
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: output/test-results
