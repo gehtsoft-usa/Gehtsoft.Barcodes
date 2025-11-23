@@ -8,8 +8,7 @@ using Gehtsoft.Barcodes.UnitTests.Barcodes;
 using Gehtsoft.Barcodes.Rendering;
 using Gehtsoft.Barcodes.Data;
 using System.IO;
-using System.Drawing.Imaging;
-using System.Drawing;
+using SkiaSharp;
 
 namespace Gehtsoft.Barcodes.UnitTests
 {
@@ -156,11 +155,11 @@ namespace Gehtsoft.Barcodes.UnitTests
                 rotation = BarcodeRotation.Clockwise_90;
             switch (type)
             {
-                case BarcodeType.EAN_13:                   
+                case BarcodeType.EAN_13:
                     int widthShould = EANData.default_barcode_width_EAN_13 * scaleMultiplier;
                     int heightShould = BarcodesUtils.GetBarcodeHeightInt(widthShould, type);
                     heightShould = heightShould - (int)(heightShould * BarcodesUtils.GetPercentToCut(heightShould, heightToCut, scaleMultiplier) / 100);
-                    Bitmap bitmap = BarcodesRenderer.DrawBitmapEAN_UPC(
+                    SKBitmap bitmap = BarcodesRenderer.DrawBitmapEAN_UPC(
                         BarcodesTestData.encodedTestDataEAN_13,
                         BarcodesTestData.inputTestStringEAN_13,
                         type, heightToCut, true, scaleMultiplier, null, null, hasQuiteZones, rotation);
@@ -242,8 +241,8 @@ namespace Gehtsoft.Barcodes.UnitTests
             MeasureBarcodeUnit heightToCut = new MeasureBarcodeUnit(heightToCutValue, heightToCutType);
             float labelHeight = scaleMultiplier * 2;
             int widthShould;
-            Font labelFont = new Font(GS1_128Data.font_family_name, GS1_128Data.default_font_size * scaleMultiplier);
-            labelHeight += labelFont.Size;
+            // Font calculation for label height - using SkiaSharp internally now
+            labelHeight += GS1_128Data.default_font_size * scaleMultiplier;
             BarcodeRotation rotation = BarcodeRotation.Clockwise_0;
             if (rotate270)
                 rotation = BarcodeRotation.Clockwise_270;
@@ -257,7 +256,7 @@ namespace Gehtsoft.Barcodes.UnitTests
                     int heightShould = (int)(widthShould * 0.15f);
                     heightShould = heightShould - (int)(heightShould * BarcodesUtils.GetPercentToCut(heightShould, heightToCut, scaleMultiplier) / 100);
                     heightShould = heightShould + (int)labelHeight;
-                    Bitmap bitmap = BarcodesRenderer.DrawBitmapGS1_128(
+                    SKBitmap bitmap = BarcodesRenderer.DrawBitmapGS1_128(
                         BarcodesTestData.encodedTestDataGS1_128A,
                         BarcodesTestData.inputTestStringGS1_128A,
                         heightToCut,
