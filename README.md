@@ -10,12 +10,11 @@ You can easily add barcodes to your application using the convenient API methods
 
 The following platforms are supported:
 
-* .NET Framework 4.5.1 and later
-* .NET Standard 2.0
+* .NET Standard 8.0
 
 # Main features
 
-Currently the library supports generation of the following types of barcodes and QR codes: 
+Currently the library supports generation of the following types of barcodes and QR codes:
 - EAN-8
 - EAN-13
 - GS1-128A
@@ -81,15 +80,15 @@ public class QuickStart
             image.Save("barcodeGS128.png", System.Drawing.Imaging.ImageFormat.Png);
         }
 
-        byte[] dataQR = BarcodesMaker.GetQRCode("QRCode example", 
-                                                QRCodeEncodingMethod.Binary, 
+        byte[] dataQR = BarcodesMaker.GetQRCode("QRCode example",
+                                                QRCodeEncodingMethod.Binary,
                                                 QRCodeErrorCorrection.M,
                                                 8);
         using (Image image = Image.FromStream(new MemoryStream(dataQR)))
         {
             image.Save("QRCode.png", System.Drawing.Imaging.ImageFormat.Png);
         }
-		
+
         byte[] dataBarcode8 = BarcodesMaker.GetBarcode("01234567",
                                                         BarcodeType.EAN_8,
                                                         Color.Blue,
@@ -122,7 +121,7 @@ public class QuickStart
                                                         Color.Gray,
                                                         true,
                                                         MeasureBarcodeUnit.FromPixel(0),
-                                                        2, 
+                                                        2,
                                                         false);
         using (Image image = Image.FromStream(new MemoryStream(dataBarcodeGS128)))
         {
@@ -132,8 +131,8 @@ public class QuickStart
         byte[] dataQR = BarcodesMaker.GetQRCode("QRCode example",
                                                 QRCodeEncodingMethod.Binary,
                                                 QRCodeErrorCorrection.M,
-                                                8, 
-                                                Color.Black, Color.Green, 
+                                                8,
+                                                Color.Black, Color.Green,
                                                 false);
         using (Image image = Image.FromStream(new MemoryStream(dataQR)))
         {
@@ -180,7 +179,7 @@ public class QuickStart
         using (Image image = Image.FromStream(new MemoryStream(dataBarcode13)))
         {
             image.Save("rotation_270_clockwise.png", System.Drawing.Imaging.ImageFormat.Png);
-        }		
+        }
     }
 }
 ```
@@ -188,30 +187,30 @@ We have successfully saved the barcode images: EAN8, EAN13, GS1-128, QR Code.
 
 ## Parameters
 
-List of parameters of user API methods:  
+List of parameters of user API methods:
 
 EAN8, EAN13, UPC-A, GS1-128A, GS1-128B, GS1-128C barcodes:
-- data - the input data for the barcode. 
-- barcodeType - the barcode type.  
-- lineColor - the color of barcode lines.  
-- backColor - the background color.  
-- showDataLabel - defines whether the input data is printed under the barcode lines.  
-- heightToCut - the height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.    
+- data - the input data for the barcode.
+- barcodeType - the barcode type.
+- lineColor - the color of barcode lines.
+- backColor - the background color.
+- showDataLabel - defines whether the input data is printed under the barcode lines.
+- heightToCut - the height in pixels or in percent to be cut from the top of the barcode lines to reduce the standard height.
 - scaleMultiplier - the pixel scaling of the resulting barcode image.
-- hasQuietZones - defines whether the barcode has quiet zones. 
+- hasQuietZones - defines whether the barcode has quiet zones.
 - barcodeRotation - defines barcode rotation angle.
 
 QR codes:
-- encoding - the QR code encoding.  
-- levelCorrection - the level of error correction.  
-- foregroundColor - the QR code color.  
-- backgroundColor - the background color.  
+- encoding - the QR code encoding.
+- levelCorrection - the level of error correction.
+- foregroundColor - the QR code color.
+- backgroundColor - the background color.
 - scaleMultiplier - the pixel scaling of the resulting QRcode image.
 - hasQuietZones - defines whether the QR code has quiet zones.
 
 # More information
 
-For more information about **Gehtsoft.Barcodes**, follow these links: 
+For more information about **Gehtsoft.Barcodes**, follow these links:
 
 * If you need to use barcodes or QR codes in PDF documents, we offer our own [Gehtsoft PDFFlow library](https://www.nuget.org/packages/Gehtsoft.PDFFlowlib) for efficient, quick and easy creation of PDF documents of any complexity. [Gehtsoft.PDFFlow](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/) is an excellent C# library that allows developers to easily generate complex documents for real business applications. [PDFFlow](https://www.nuget.org/packages/Gehtsoft.PDFFlowLib/) utilizes the **Gehtsoft.Barcodes** library to generate barcodes and QR codes and offers many additional formatting and layouting options.
 
